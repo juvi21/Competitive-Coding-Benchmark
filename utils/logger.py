@@ -30,7 +30,7 @@ class JSONLogger:
             "total_passed_problems": 0
         }
 
-    def log_problem(self, title, results, solution, total_problems_passed):
+    def log_problem(self, title, category, results, solution, total_problems_passed):
         passed_count = sum(1 for result in results if result['pass'])
         total_count = len(results)
         exceeded_time_count = sum(1 for result in results if "Time limit exceeded" in result.get("error", ""))
@@ -39,8 +39,11 @@ class JSONLogger:
         mean_time_taken = sum(result['time_taken'] for result in results) / total_count if total_count > 0 else 0
         mean_memory_used = sum(result['memory_used'] for result in results) / total_count if total_count > 0 else 0
 
+        problem_passed = passed_count == total_count
+
         problem_log = {
             "title": title,
+            "category": category,
             "solution": solution,
             "passed_test_cases": passed_count,
             "total_test_cases": total_count,
@@ -50,15 +53,18 @@ class JSONLogger:
             "failed_test_cases": [i + 1 for i, result in enumerate(results) if not result["pass"]],
             "exceeded_time_count": exceeded_time_count,
             "exceeded_memory_count": exceeded_memory_count,
-            "total_problems_passed": total_problems_passed
+            "total_problems_passed": total_problems_passed,
+            "passed": problem_passed  # Add passed field
         }
         self.data["problems"].append(problem_log)
-        self.data["total_passed_problems"] = total_problems_passed
+        if problem_passed:
+            self.data["total_passed_problems"] += 1
         self._write_log()
 
-    def log_compilation_error(self, title, solution, error_message, total_problems_passed):
+    def log_compilation_error(self, title, category, solution, error_message, total_problems_passed):
         problem_log = {
             "title": title,
+            "category": category,
             "solution": solution,
             "passed_test_cases": 0,
             "total_test_cases": 0,
@@ -68,10 +74,10 @@ class JSONLogger:
             "failed_test_cases": [],
             "exceeded_time_count": 0,
             "exceeded_memory_count": 0,
-            "total_problems_passed": total_problems_passed
+            "total_problems_passed": total_problems_passed,
+            "passed": False  # Add passed field
         }
         self.data["problems"].append(problem_log)
-        self.data["total_passed_problems"] = total_problems_passed
         self._write_log()
 
     def _write_log(self):

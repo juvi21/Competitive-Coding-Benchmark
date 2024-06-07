@@ -6,6 +6,7 @@ from judges.cpp_judge import CppJudge
 from utils.logger import Logger, JSONLogger
 from utils.models import Problem, Config
 from providers.openai import OpenAIProvider
+from utils.utils import sanitize_filename  # Import the new utility function
 from pydantic import ValidationError
 
 def load_problems(file_path: str) -> list[str]:
@@ -29,27 +30,35 @@ def main():
     logger = Logger()
     json_logger = JSONLogger('log.json')
     
-    problems = load_problems('problems.jsonl')
+    problems = load_problems('sorted_problems.jsonl')
     config = load_config('config.json')
     
     ignore_time_limits = config.ignore_time_limits
-    
+    categories_filter = config.categories  # Get the categories from the config
+
     judge = CppJudge(logger)
     
     provider = None
     if config.provider == "openai":
         provider = OpenAIProvider(config.api_key, config.model, config.base_prompt, logger)
     
-    total_problems = len(problems)
+    if categories_filter:
+        filtered_problems = [problem for problem in problems if json.loads(problem).get("category") in categories_filter]
+    else:
+        filtered_problems = problems
+
+    total_filtered_problems = len(filtered_problems)
     problems_passed = 0
 
-    for index, problem_str in enumerate(tqdm(problems, desc="Processing problems")):
+    for index, problem_str in enumerate(tqdm(filtered_problems, desc="Processing problems")):
         problem_data = json.loads(problem_str)
-        logger.log('info', f"Judging problem: {problem_data['title']}")
-        
-        cpp_file = f"solution_{index}.cpp"
-        binary_file = f"./solution_binary_{index}"
-        
+        problem_title = problem_data['title']
+        sanitized_title = sanitize_filename(problem_title)  # Sanitize the problem title for file names
+        logger.log('info', f"Judging problem: {problem_title}")
+
+        cpp_file = f"{sanitized_title}.cpp"
+        binary_file = f"./{sanitized_title}_binary"
+
         # Generate a solution using the provider
         if provider:
             solution = provider.generate_solution(problem_data)
@@ -62,16 +71,16 @@ def main():
                         problem = Problem(**problem_data)
                         results = judge.judge_problem(problem, binary_file, ignore_time_limits)
                         summary = generate_summary(results)
-                        logger.log('info', f"Problem {index + 1}/{total_problems}: {summary}")
+                        logger.log('info', f"Problem {index + 1}/{total_filtered_problems}: {summary}")
                         if all(result['pass'] for result in results):
                             problems_passed += 1
-                        json_logger.log_problem(problem.title, results, solution, problems_passed)
-                        logger.log('info', f"Total problems passed so far: {problems_passed}/{total_problems}")
+                        json_logger.log_problem(problem.title, problem.category or "Uncategorized", results, solution, problems_passed)
+                        logger.log('info', f"Total problems passed so far: {problems_passed}/{total_filtered_problems}")
                     except ValidationError as e:
                         logger.log('error', f"Problem validation error: {e}")
                 else:
                     logger.log('error', "Compilation failed")
-                    json_logger.log_compilation_error(problem_data["title"], solution, "Compilation failed", problems_passed)
+                    json_logger.log_compilation_error(problem_data["title"], problem_data.get("category", "Uncategorized"), solution, "Compilation failed", problems_passed)
             else:
                 logger.log('error', "Solution generation failed")
         else:

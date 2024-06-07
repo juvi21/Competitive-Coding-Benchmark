@@ -1,5 +1,5 @@
 from pydantic import BaseModel, validator
-from typing import List
+from typing import List, Optional
 
 class Example(BaseModel):
     input: str
@@ -19,6 +19,7 @@ class Problem(BaseModel):
     constraints: str
     example: Example
     test_cases: List[TestCase]
+    category: Optional[str] = None
 
     @validator('time_limit')
     def parse_time_limit(cls, v):
@@ -38,3 +39,4 @@ class Config(BaseModel):
     api_key: str
     model: str
     base_prompt: str = "You are a helpful assistant."
+    categories: Optional[List[str]] = None
