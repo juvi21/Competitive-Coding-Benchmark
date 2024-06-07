@@ -5,7 +5,8 @@ from judges.cpp_judge import CppJudge
 from utils.logger import Logger, JSONLogger
 from utils.models import Problem, Config
 from providers.openai import OpenAIProvider
-from providers.huggingface import HuggingFaceProvider  # Import HuggingFaceProvider
+from providers.huggingface import HuggingFaceProvider
+from providers.anthropic import AnthropicProvider  # Import AnthropicProvider
 from utils.utils import sanitize_filename
 from pydantic import ValidationError
 from datasets import load_dataset
@@ -44,6 +45,8 @@ def main():
         provider = OpenAIProvider(config.api_key, config.model, config.base_prompt, logger)
     elif config.provider == "huggingface":
         provider = HuggingFaceProvider(config.model, config.base_prompt, logger)
+    elif config.provider == "anthropic":
+        provider = AnthropicProvider(config.api_key, config.model, config.base_prompt, logger)
 
     if categories_filter:
         filtered_problems = [problem for problem in problems if json.loads(problem).get("category") in categories_filter]
