@@ -30,7 +30,7 @@ class JSONLogger:
             "total_passed_problems": 0
         }
 
-    def log_problem(self, title, category, results, solution, total_problems_passed):
+    def log_problem(self, title, category, results, solution, total_problems_passed, shots_info):
         passed_count = sum(1 for result in results if result['pass'])
         total_count = len(results)
         exceeded_time_count = sum(1 for result in results if "Time limit exceeded" in result.get("error", ""))
@@ -54,14 +54,15 @@ class JSONLogger:
             "exceeded_time_count": exceeded_time_count,
             "exceeded_memory_count": exceeded_memory_count,
             "total_problems_passed": total_problems_passed,
-            "passed": problem_passed  # Add passed field
+            "passed": problem_passed,
+            "shots_info": shots_info  # Add shot information
         }
         self.data["problems"].append(problem_log)
         if problem_passed:
             self.data["total_passed_problems"] += 1
         self._write_log()
 
-    def log_compilation_error(self, title, category, solution, error_message, total_problems_passed):
+    def log_compilation_error(self, title, category, solution, error_message, total_problems_passed, shot):
         problem_log = {
             "title": title,
             "category": category,
@@ -75,7 +76,8 @@ class JSONLogger:
             "exceeded_time_count": 0,
             "exceeded_memory_count": 0,
             "total_problems_passed": total_problems_passed,
-            "passed": False  # Add passed field
+            "passed": False,
+            "shot": shot  # Log which shot failed
         }
         self.data["problems"].append(problem_log)
         self._write_log()

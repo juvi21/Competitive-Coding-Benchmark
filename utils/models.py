@@ -40,3 +40,4 @@ class Config(BaseModel):
     model: str
     base_prompt: str = "You are a helpful assistant."
     categories: Optional[List[str]] = None
+    shots: int = 1
