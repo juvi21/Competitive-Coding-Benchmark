@@ -3,128 +3,21 @@
         {
             "title": "Apartments",
             "category": "Sorting and Searching",
-            "solution": "#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint main() {\n    int n, m, k;\n    std::cin >> n >> m >> k;\n    \n    std::vector<int> desired_sizes(n);\n    std::vector<int> apartment_sizes(m);\n    \n    for(int i = 0; i < n; i++) {\n        std::cin >> desired_sizes[i];\n    }\n    \n    for(int i = 0; i < m; i++) {\n        std::cin >> apartment_sizes[i];\n    }\n    \n    std::sort(desired_sizes.begin(), desired_sizes.end());\n    std::sort(apartment_sizes.begin(), apartment_sizes.end());\n    \n    int i = 0, j = 0, matches = 0;\n    \n    while(i < n && j < m) {\n        if(apartment_sizes[j] >= desired_sizes[i] - k && apartment_sizes[j] <= desired_sizes[i] + k) {\n            matches++;\n            i++;\n            j++;\n        } else if(apartment_sizes[j] < desired_sizes[i] - k) {\n            j++;\n        } else {\n            i++;\n        }\n    }\n    \n    std::cout << matches << std::endl;\n    \n    return 0;\n}",
-            "passed_test_cases": 19,
-            "total_test_cases": 19,
-            "mean_time_taken": 0.13874381466915733,
-            "mean_memory_used": 7124064.0,
-            "failure_reasons": [],
+            "solution": "No solution generated",
+            "passed_test_cases": 0,
+            "total_test_cases": 0,
+            "mean_time_taken": 0,
+            "mean_memory_used": 0,
+            "failure_reasons": [
+                "Solution generation failed"
+            ],
             "failed_test_cases": [],
             "exceeded_time_count": 0,
             "exceeded_memory_count": 0,
-            "total_problems_passed": 1,
-            "passed": true,
-            "shots_info": {
-                "shot": 1,
-                "status": "passed"
-            }
-        },
-        {
-            "title": "Apples and Bananas",
-            "category": "Advanced Techniques",
-            "solution": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int k, n, m;\n    cin >> k >> n >> m;\n    \n    vector<int> apple_weights(n);\n    vector<int> banana_weights(m);\n    \n    for (int i = 0; i < n; ++i) {\n        cin >> apple_weights[i];\n    }\n    \n    for (int i = 0; i < m; ++i) {\n        cin >> banana_weights[i];\n    }\n    \n    vector<int> apple_count(k + 1, 0);\n    vector<int> banana_count(k + 1, 0);\n    \n    // Count the occurrences of each weight for apples\n    for (int weight : apple_weights) {\n        ++apple_count[weight];\n    }\n    \n    // Count the occurrences of each weight for bananas\n    for (int weight : banana_weights) {\n        ++banana_count[weight];\n    }\n    \n    // Calculate the number of ways for each combined weight w\n    vector<int> result(2 * k + 1, 0);\n    \n    for (int w = 2; w <= 2 * k; ++w) {\n        for (int i = 1; i < w; ++i) {\n            if (i <= k && (w - i) <= k) {\n                result[w] += apple_count[i] * banana_count[w - i];\n            }\n        }\n    }\n    \n    // Output the results\n    for (int w = 2; w <= 2 * k; ++w) {\n        cout << result[w] << \" \";\n    }\n    cout << endl;\n    \n    return 0;\n}",
-            "passed_test_cases": 2,
-            "total_test_cases": 6,
-            "mean_time_taken": 0.7220104535420736,
-            "mean_memory_used": 7124064.0,
-            "failure_reasons": [
-                "",
-                "",
-                "",
-                ""
-            ],
-            "failed_test_cases": [
-                2,
-                3,
-                5,
-                6
-            ],
-            "exceeded_time_count": 0,
-            "exceeded_memory_count": 0,
-            "total_problems_passed": 1,
+            "total_problems_passed": 0,
             "passed": false,
-            "shots_info": {
-                "shot": 1,
-                "status": "failed"
-            }
-        },
-        {
-            "title": "Apples and Bananas",
-            "category": "Advanced Techniques",
-            "solution": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int k, n, m;\n    cin >> k >> n >> m;\n    \n    vector<int> apples(n);\n    vector<int> bananas(m);\n    \n    // Read weights of apples\n    for (int i = 0; i < n; i++) {\n        cin >> apples[i];\n    }\n    \n    // Read weights of bananas\n    for (int i = 0; i < m; i++) {\n        cin >> bananas[i];\n    }\n    \n    // Frequency arrays for weights of apples and bananas\n    vector<int> apple_count(k + 1, 0);\n    vector<int> banana_count(k + 1, 0);\n    \n    // Count frequencies of each weight for apples\n    for (int i = 0; i < n; i++) {\n        apple_count[apples[i]]++;\n    }\n    \n    // Count frequencies of each weight for bananas\n    for (int i = 0; i < m; i++) {\n        banana_count[bananas[i]]++;\n    }\n    \n    // Result array to store the number of ways for each weight w\n    vector<int> result(2 * k + 1, 0);\n    \n    // Calculate the number of ways to choose an apple and a banana for each weight w\n    for (int w = 2; w <= 2 * k; w++) {\n        for (int i = 1; i <= k; i++) {\n            if (w - i >= 1 && w - i <= k) {\n                result[w] += apple_count[i] * banana_count[w - i];\n            }\n        }\n    }\n    \n    // Output the result\n    for (int w = 2; w <= 2 * k; w++) {\n        cout << result[w] << \" \";\n    }\n    cout << endl;\n    \n    return 0;\n}",
-            "passed_test_cases": 2,
-            "total_test_cases": 6,
-            "mean_time_taken": 0.7210723559061686,
-            "mean_memory_used": 7124064.0,
-            "failure_reasons": [
-                "",
-                "",
-                "",
-                ""
-            ],
-            "failed_test_cases": [
-                2,
-                3,
-                5,
-                6
-            ],
-            "exceeded_time_count": 0,
-            "exceeded_memory_count": 0,
-            "total_problems_passed": 1,
-            "passed": false,
-            "shots_info": {
-                "shot": 2,
-                "status": "failed"
-            }
-        },
-        {
-            "title": "Apples and Bananas",
-            "category": "Advanced Techniques",
-            "solution": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    // Read inputs\n    int k, n, m;\n    cin >> k >> n >> m;\n\n    vector<int> apples(n);\n    vector<int> bananas(m);\n\n    // Read apple weights\n    for (int i = 0; i < n; ++i) {\n        cin >> apples[i];\n    }\n\n    // Read banana weights\n    for (int i = 0; i < m; ++i) {\n        cin >> bananas[i];\n    }\n\n    // Frequency arrays for apple and banana weights\n    vector<int> freqA(k + 1, 0);\n    vector<int> freqB(k + 1, 0);\n\n    // Count frequencies of each weight in apples\n    for (int i = 0; i < n; ++i) {\n        freqA[apples[i]]++;\n    }\n\n    // Count frequencies of each weight in bananas\n    for (int i = 0; i < m; ++i) {\n        freqB[bananas[i]]++;\n    }\n\n    // Result array to store counts of valid pairs for each weight sum w\n    vector<int> result(2 * k + 1, 0);\n\n    // Calculate the number of valid pairs for each possible weight sum w\n    for (int w = 2; w <= 2 * k; ++w) {\n        for (int i = 1; i < w; ++i) {\n            if (i <= k && (w - i) <= k) {\n                result[w] += freqA[i] * freqB[w - i];\n            }\n        }\n    }\n\n    // Output the results for sums from 2 to 2k\n    for (int w = 2; w <= 2 * k; ++w) {\n        cout << result[w] << \" \";\n    }\n    cout << endl;\n\n    return 0;\n}",
-            "passed_test_cases": 2,
-            "total_test_cases": 6,
-            "mean_time_taken": 0.7198899586995443,
-            "mean_memory_used": 7124064.0,
-            "failure_reasons": [
-                "",
-                "",
-                "",
-                ""
-            ],
-            "failed_test_cases": [
-                2,
-                3,
-                5,
-                6
-            ],
-            "exceeded_time_count": 0,
-            "exceeded_memory_count": 0,
-            "total_problems_passed": 1,
-            "passed": false,
-            "shots_info": {
-                "shot": 3,
-                "status": "failed"
-            }
-        },
-        {
-            "title": "Array Division",
-            "category": "Sorting and Searching",
-            "solution": "#include <iostream>\n#include <vector>\n#include <algorithm>\n#include <numeric>\n\nusing namespace std;\n\nbool canDivide(const vector<int>& arr, int n, int k, long long maxSum) {\n    long long currentSum = 0;\n    int subarrays = 1;\n    \n    for (int i = 0; i < n; ++i) {\n        if (currentSum + arr[i] > maxSum) {\n            currentSum = arr[i];\n            ++subarrays;\n            if (subarrays > k) {\n                return false;\n            }\n        } else {\n            currentSum += arr[i];\n        }\n    }\n    \n    return true;\n}\n\nint main() {\n    int n, k;\n    cin >> n >> k;\n    vector<int> arr(n);\n    \n    for (int i = 0; i < n; ++i) {\n        cin >> arr[i];\n    }\n    \n    long long left = *max_element(arr.begin(), arr.end());\n    long long right = accumulate(arr.begin(), arr.end(), 0LL);\n    long long result = right;\n    \n    while (left <= right) {\n        long long mid = left + (right - left) / 2;\n        \n        if (canDivide(arr, n, k, mid)) {\n            result = mid;\n            right = mid - 1;\n        } else {\n            left = mid + 1;\n        }\n    }\n    \n    cout << result << endl;\n    \n    return 0;\n}",
-            "passed_test_cases": 18,
-            "total_test_cases": 18,
-            "mean_time_taken": 0.11195431815253364,
-            "mean_memory_used": 7124064.0,
-            "failure_reasons": [],
-            "failed_test_cases": [],
-            "exceeded_time_count": 0,
-            "exceeded_memory_count": 0,
-            "total_problems_passed": 2,
-            "passed": true,
-            "shots_info": {
-                "shot": 1,
-                "status": "passed"
-            }
+            "shot": 1
         }
     ],
-    "total_passed_problems": 2
+    "total_passed_problems": 0
 }
