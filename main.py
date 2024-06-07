@@ -1,10 +1,12 @@
 import json
+import time
+import os
+from tqdm import tqdm
 from judges.cpp_judge import CppJudge
-from utils.logger import Logger
+from utils.logger import Logger, JSONLogger
 from utils.models import Problem, Config
 from providers.openai import OpenAIProvider
 from pydantic import ValidationError
-import os
 
 def load_problems(file_path: str) -> list[str]:
     problems = []
@@ -18,17 +20,14 @@ def load_config(config_path: str) -> Config:
         config_json = json.load(file)
         return Config(**config_json)
 
-def generate_report(results: list[dict]) -> str:
-    report = []
-    for result in results:
-        report_line = (f"Input: {result['input']}\nExpected Output: {result['expected_output']}\n"
-                       f"Actual Output: {result['actual_output']}\nPass: {result['pass']}\n"
-                       f"{result['log']}\n")
-        report.append(report_line)
-    return "\n".join(report)
+def generate_summary(results: list[dict]) -> str:
+    passed_count = sum(1 for result in results if result['pass'])
+    total_count = len(results)
+    return f"Passed {passed_count}/{total_count} test cases"
 
 def main():
     logger = Logger()
+    json_logger = JSONLogger('log.json')
     
     problems = load_problems('problems.jsonl')
     config = load_config('config.json')
@@ -41,7 +40,10 @@ def main():
     if config.provider == "openai":
         provider = OpenAIProvider(config.api_key, config.model, config.base_prompt, logger)
     
-    for index, problem_str in enumerate(problems):
+    total_problems = len(problems)
+    problems_passed = 0
+
+    for index, problem_str in enumerate(tqdm(problems, desc="Processing problems")):
         problem_data = json.loads(problem_str)
         logger.log('info', f"Judging problem: {problem_data['title']}")
         
@@ -59,18 +61,25 @@ def main():
                     try:
                         problem = Problem(**problem_data)
                         results = judge.judge_problem(problem, binary_file, ignore_time_limits)
-                        report = generate_report(results)
-                        print(report)
+                        summary = generate_summary(results)
+                        logger.log('info', f"Problem {index + 1}/{total_problems}: {summary}")
+                        if all(result['pass'] for result in results):
+                            problems_passed += 1
+                        json_logger.log_problem(problem.title, results, solution, problems_passed)
+                        logger.log('info', f"Total problems passed so far: {problems_passed}/{total_problems}")
                     except ValidationError as e:
                         logger.log('error', f"Problem validation error: {e}")
                 else:
                     logger.log('error', "Compilation failed")
+                    json_logger.log_compilation_error(problem_data["title"], solution, "Compilation failed", problems_passed)
             else:
                 logger.log('error', "Solution generation failed")
         else:
             logger.log('error', "No provider configured")
 
-        # Clean up the binary file after judging
+        # Clean up the solution and binary files after judging
+        if os.path.exists(cpp_file):
+            os.remove(cpp_file)
         if os.path.exists(binary_file):
             os.remove(binary_file)
 
