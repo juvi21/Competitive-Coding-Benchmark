@@ -2456,9 +2456,138 @@
                 "shot": 1,
                 "status": "failed"
             }
+        },
+        {
+            "title": "Eulerian Subgraphs",
+            "category": "Advanced Techniques",
+            "solution": "#include <bits/stdc++.h>\nusing namespace std;\n\nconst int MOD = 1e9 + 7;\n\nint n, m;\nvector<vector<int>> adj;\n\ninline int mod(int x, int m) {\n    return (x % m + m) % m;\n}\n\nint determinant(vector<vector<int>>& mat) {\n    int n = mat.size();\n    int det = 1;\n    for (int i = 0; i < n; ++i) {\n        int pivot = i;\n        for (int j = i + 1; j < n; ++j) {\n            if (abs(mat[j][i]) > abs(mat[pivot][i])) {\n                pivot = j;\n            }\n        }\n        if (i != pivot) {\n            swap(mat[i], mat[pivot]);\n            det = mod(-det, MOD);\n        }\n        det = mod(det * mat[i][i], MOD);\n        for (int j = i + 1; j < n; ++j) {\n            int factor = mod(mat[j][i] * pow(mat[i][i], MOD - 2), MOD);\n            for (int k = i; k < n; ++k) {\n                mat[j][k] = mod(mat[j][k] - mod(factor * mat[i][k], MOD), MOD);\n            }\n        }\n    }\n    return det;\n}\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(0);\n\n    cin >> n >> m;\n    adj.resize(n, vector<int>(n, 0));\n    \n    for (int i = 0; i < m; ++i) {\n        int u, v;\n        cin >> u >> v;\n        u--; v--;\n        adj[u][v]++;\n        adj[v][u]++;\n    }\n\n    vector<vector<int>> laplacian(n, vector<int>(n, 0));\n    for (int i = 0; i < n; ++i) {\n        for (int j = 0; j < n; ++j) {\n            if (i != j) {\n                laplacian[i][j] = -adj[i][j];\n            }\n        }\n        laplacian[i][i] = accumulate(adj[i].begin(), adj[i].end(), 0);\n    }\n\n    vector<vector<int>> cofactor(n - 1, vector<int>(n - 1, 0));\n    for (int i = 1; i < n; ++i) {\n        for (int j = 1; j < n; ++j) {\n            cofactor[i - 1][j - 1] = laplacian[i][j];\n        }\n    }\n\n    int result = determinant(cofactor);\n    cout << result << \"\\n\";\n\n    return 0;\n}\n",
+            "passed_test_cases": 0,
+            "total_test_cases": 3,
+            "mean_time_taken": 0.17226735750834146,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "Failed",
+                "terminate called after throwing an instance of 'std::bad_alloc'\n  what():  std::bad_alloc\n",
+                "Failed"
+            ],
+            "failed_test_cases": [
+                1,
+                2,
+                3
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 28,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Even Outdegree Edges",
+            "category": "Additional Problems",
+            "solution": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nconst int MAXN = 100000;\n\nvector<int> adj[MAXN + 1]; // adjacency list\nvector<pair<int, int>> edges; // list of edges\nbool visited[MAXN + 1]; // visited array\nint outdegree[MAXN + 1]; // outdegree of nodes\n\nvoid dfs(int v) {\n    visited[v] = true;\n    for (int u : adj[v]) {\n        if (!visited[u]) {\n            dfs(u);\n        }\n        if (outdegree[u] % 2 == 1) {\n            // Direct edge from v to u\n            edges.push_back({v, u});\n            outdegree[v]++;\n            outdegree[u]--;\n        } else {\n            // Direct edge from u to v\n            edges.push_back({u, v});\n            outdegree[u]++;\n            outdegree[v]--;\n        }\n    }\n}\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n\n    for (int i = 0; i < m; i++) {\n        int a, b;\n        cin >> a >> b;\n        adj[a].push_back(b);\n        adj[b].push_back(a);\n    }\n\n    fill(visited, visited + n + 1, false);\n    fill(outdegree, outdegree + n + 1, 0);\n\n    for (int i = 1; i <= n; i++) {\n        if (!visited[i]) {\n            dfs(i);\n        }\n    }\n\n    bool possible = true;\n    for (int i = 1; i <= n; i++) {\n        if (outdegree[i] % 2 != 0) {\n            possible = false;\n            break;\n        }\n    }\n\n    if (possible) {\n        for (auto &edge : edges) {\n            cout << edge.first << \" \" << edge.second << endl;\n        }\n    } else {\n        cout << \"IMPOSSIBLE\" << endl;\n    }\n\n    return 0;\n}\n",
+            "passed_test_cases": 0,
+            "total_test_cases": 8,
+            "mean_time_taken": 0.27869531512260437,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed"
+            ],
+            "failed_test_cases": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 28,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Exponentiation",
+            "category": "Mathematics",
+            "solution": "#include <iostream>\n#include <vector>\n\nconst int MOD = 1e9 + 7;\n\nlong long mod_exponentiation(long long base, long long exp, long long mod) {\n    if (exp == 0) return 1;\n    long long half = mod_exponentiation(base, exp / 2, mod);\n    half = (half * half) % mod;\n    if (exp % 2 != 0) {\n        half = (half * base) % mod;\n    }\n    return half;\n}\n\nint main() {\n    int n;\n    std::cin >> n;\n    std::vector<std::pair<long long, long long>> queries(n);\n    for (int i = 0; i < n; ++i) {\n        std::cin >> queries[i].first >> queries[i].second;\n    }\n\n    for (const auto& query : queries) {\n        long long a = query.first;\n        long long b = query.second;\n        std::cout << mod_exponentiation(a, b, MOD) << std::endl;\n    }\n\n    return 0;\n}\n",
+            "passed_test_cases": 3,
+            "total_test_cases": 3,
+            "mean_time_taken": 0.23488322893778482,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [],
+            "failed_test_cases": [],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 29,
+            "passed": true,
+            "shots_info": {
+                "shot": 1,
+                "status": "passed"
+            }
+        },
+        {
+            "title": "Exponentiation II",
+            "category": "Mathematics",
+            "solution": "#include <iostream>\n#include <vector>\n#include <cmath>\n#define MOD 1000000007\n#define PHI_MOD 1000000006\n\nusing namespace std;\n\n// Function to perform modular exponentiation\nlong long mod_exp(long long base, long long exp, long long mod) {\n    long long result = 1;\n    while (exp > 0) {\n        if (exp % 2 == 1) {\n            result = (result * base) % mod;\n        }\n        base = (base * base) % mod;\n        exp /= 2;\n    }\n    return result;\n}\n\nint main() {\n    int n;\n    cin >> n;\n    vector<long long> results;\n    \n    for (int i = 0; i < n; ++i) {\n        long long a, b, c;\n        cin >> a >> b >> c;\n        \n        if (a == 0) {\n            if (b == 0 && c == 0) {\n                results.push_back(1);\n            } else {\n                results.push_back(0);\n            }\n            continue;\n        }\n        \n        // Calculate b^c % (10^9 + 6)\n        long long exponent = mod_exp(b, c, PHI_MOD);\n        \n        // Calculate a^exponent % (10^9 + 7)\n        long long result = mod_exp(a, exponent, MOD);\n        \n        results.push_back(result);\n    }\n    \n    for (const auto& res : results) {\n        cout << res << endl;\n    }\n    \n    return 0;\n}\n",
+            "passed_test_cases": 10,
+            "total_test_cases": 13,
+            "mean_time_taken": 0.14684092081510103,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "Failed",
+                "Failed",
+                "Failed"
+            ],
+            "failed_test_cases": [
+                1,
+                4,
+                7
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 29,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Factory Machines",
+            "category": "Sorting and Searching",
+            "solution": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nbool canProduceInTime(const vector<long long>& machines, long long t, long long time) {\n    long long totalProducts = 0;\n    for (long long machine : machines) {\n        totalProducts += time / machine;\n        if (totalProducts >= t) {\n            return true;\n        }\n    }\n    return false;\n}\n\nlong long minTimeToProduceProducts(const vector<long long>& machines, long long t) {\n    long long low = 1;\n    long long high = *min_element(machines.begin(), machines.end()) * t;\n    while (low < high) {\n        long long mid = (low + high) / 2;\n        if (canProduceInTime(machines, t, mid)) {\n            high = mid;\n        } else {\n            low = mid + 1;\n        }\n    }\n    return low;\n}\n\nint main() {\n    int n;\n    long long t;\n    cin >> n >> t;\n    vector<long long> machines(n);\n    for (int i = 0; i < n; ++i) {\n        cin >> machines[i];\n    }\n    cout << minTimeToProduceProducts(machines, t) << endl;\n    return 0;\n}\n",
+            "passed_test_cases": 18,
+            "total_test_cases": 18,
+            "mean_time_taken": 0.10396479235755073,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [],
+            "failed_test_cases": [],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 30,
+            "passed": true,
+            "shots_info": {
+                "shot": 1,
+                "status": "passed"
+            }
         }
     ],
-    "total_passed_problems": 28,
+    "total_passed_problems": 30,
     "initial_config": {
         "ignore_time_limits": false,
         "model": "gpt-4o",
