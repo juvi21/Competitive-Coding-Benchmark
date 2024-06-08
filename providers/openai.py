@@ -1,11 +1,10 @@
 import openai
 from providers.base import BaseProvider
 from utils.logger import Logger
-import re
 
 class OpenAIProvider(BaseProvider):
-    def __init__(self, api_key: str, model: str, base_prompt: str, logger: Logger):
-        super().__init__(logger)
+    def __init__(self, api_key: str, model: str, base_prompt: str, logger: Logger, language: str):
+        super().__init__(logger, language)
         openai.api_key = api_key
         self.model = model
         self.base_prompt = base_prompt
@@ -22,7 +21,7 @@ class OpenAIProvider(BaseProvider):
             f"Constraints: {problem['constraints']}\n"
             f"Example Input: {problem['example']['input']}\n"
             f"Example Output: {problem['example']['output']}\n"
-            f"\nProvide the solution in a markdown cpp block.\n"
+            f"\nProvide the solution in a markdown {self.language} block.\n"
         )
 
         messages = [
@@ -42,12 +41,4 @@ class OpenAIProvider(BaseProvider):
         raw_solution = response.choices[0].message.content.strip()
         self.logger.log('info', f"Generated raw solution: {raw_solution}")
 
-        # Extract the C++ code from the markdown block
-        cpp_code_match = re.search(r"```cpp(.*?)```", raw_solution, re.DOTALL)
-        if cpp_code_match:
-            cpp_code = cpp_code_match.group(1).strip()
-            self.logger.log('info', f"Extracted C++ solution: {cpp_code}")
-            return cpp_code
-        else:
-            self.logger.log('error', "Failed to extract C++ code from the solution")
-            return ""
+        return self.extract_code(raw_solution)

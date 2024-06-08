@@ -1,0 +1,114 @@
+{
+    "problems": [
+        {
+            "title": "Acyclic Graph Edges",
+            "category": "Additional Problems",
+            "solution": "#include <iostream>\n#include <vector>\n#include <queue>\n#include <algorithm>\n\nusing namespace std;\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n    \n    vector<vector<int>> adj(n + 1);\n    vector<pair<int, int>> edges(m);\n    vector<int> in_degree(n + 1, 0);\n    \n    for (int i = 0; i < m; ++i) {\n        int u, v;\n        cin >> u >> v;\n        adj[u].push_back(v);\n        adj[v].push_back(u);\n        edges[i] = {u, v};\n    }\n    \n    // Kahn's algorithm for topological sorting\n    vector<int> topo_sort;\n    queue<int> q;\n    vector<int> visited(n + 1, 0);\n    \n    for (int i = 1; i <= n; ++i) {\n        if (!visited[i]) {\n            q.push(i);\n            while (!q.empty()) {\n                int node = q.front();\n                q.pop();\n                if (visited[node]) continue;\n                visited[node] = 1;\n                topo_sort.push_back(node);\n                for (int neighbour : adj[node]) {\n                    if (!visited[neighbour]) {\n                        q.push(neighbour);\n                    }\n                }\n            }\n        }\n    }\n    \n    vector<int> position(n + 1);\n    for (int i = 0; i < topo_sort.size(); ++i) {\n        position[topo_sort[i]] = i;\n    }\n    \n    for (auto& edge : edges) {\n        int u = edge.first;\n        int v = edge.second;\n        if (position[u] < position[v]) {\n            cout << u << \" \" << v << endl;\n        } else {\n            cout << v << \" \" << u << endl;\n        }\n    }\n    \n    return 0;\n}\n",
+            "passed_test_cases": 2,
+            "total_test_cases": 4,
+            "mean_time_taken": 0.14421862363815308,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "",
+                ""
+            ],
+            "failed_test_cases": [
+                1,
+                3
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 0,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Acyclic Graph Edges",
+            "category": "Additional Problems",
+            "solution": "#include <iostream>\n#include <vector>\n#include <queue>\n#include <algorithm>\n\nusing namespace std;\n\nvoid solve(int n, int m, vector<pair<int, int>>& edges) {\n    vector<vector<int>> adj(n + 1);\n    vector<int> in_degree(n + 1, 0);\n    \n    for (auto& edge : edges) {\n        adj[edge.first].push_back(edge.second);\n        adj[edge.second].push_back(edge.first);\n    }\n    \n    vector<int> topological_order;\n    queue<int> q;\n    \n    // Kahn's algorithm for topological sorting\n    for (int i = 1; i <= n; ++i) {\n        if (in_degree[i] == 0) {\n            q.push(i);\n        }\n    }\n    \n    while (!q.empty()) {\n        int u = q.front();\n        q.pop();\n        topological_order.push_back(u);\n        \n        for (int v : adj[u]) {\n            adj[v].erase(remove(adj[v].begin(), adj[v].end(), u), adj[v].end());\n            if (--in_degree[v] == 0) {\n                q.push(v);\n            }\n        }\n    }\n    \n    // Mapping node to its position in the topological order\n    vector<int> position(n + 1);\n    for (int i = 0; i < n; ++i) {\n        position[topological_order[i]] = i;\n    }\n    \n    // Assign directions based on the topological order\n    for (auto& edge : edges) {\n        if (position[edge.first] < position[edge.second]) {\n            cout << edge.first << \" \" << edge.second << \"\\n\";\n        } else {\n            cout << edge.second << \" \" << edge.first << \"\\n\";\n        }\n    }\n}\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n    vector<pair<int, int>> edges(m);\n    for (int i = 0; i < m; ++i) {\n        int a, b;\n        cin >> a >> b;\n        edges[i] = {a, b};\n    }\n    \n    solve(n, m, edges);\n    \n    return 0;\n}\n",
+            "passed_test_cases": 4,
+            "total_test_cases": 4,
+            "mean_time_taken": 0.1315476894378662,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [],
+            "failed_test_cases": [],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 1,
+            "passed": true,
+            "shots_info": {
+                "shot": 2,
+                "status": "passed"
+            }
+        },
+        {
+            "title": "Advertisement",
+            "category": "Additional Problems",
+            "solution": "#include <iostream>\n#include <vector>\n#include <stack>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> heights(n);\n    for (int i = 0; i < n; ++i) {\n        cin >> heights[i];\n    }\n\n    stack<int> s;\n    int max_area = 0;\n    int i = 0;\n\n    while (i < n) {\n        if (s.empty() || heights[s.top()] <= heights[i]) {\n            s.push(i++);\n        } else {\n            int top = s.top();\n            s.pop();\n            int area = heights[top] * (s.empty() ? i : i - s.top() - 1);\n            max_area = max(max_area, area);\n        }\n    }\n\n    while (!s.empty()) {\n        int top = s.top();\n        s.pop();\n        int area = heights[top] * (s.empty() ? i : i - s.top() - 1);\n        max_area = max(max_area, area);\n    }\n\n    cout << max_area << endl;\n\n    return 0;\n}\n",
+            "passed_test_cases": 7,
+            "total_test_cases": 11,
+            "mean_time_taken": 0.1058794151652943,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "",
+                "",
+                "",
+                ""
+            ],
+            "failed_test_cases": [
+                2,
+                4,
+                6,
+                8
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 1,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Advertisement",
+            "category": "Additional Problems",
+            "solution": "#include <iostream>\n#include <stack>\n#include <vector>\n#include <algorithm>\n\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> heights(n);\n    for (int i = 0; i < n; ++i) {\n        cin >> heights[i];\n    }\n\n    stack<int> s;\n    int max_area = 0;\n    int i = 0;\n\n    while (i < n) {\n        if (s.empty() || heights[s.top()] <= heights[i]) {\n            s.push(i++);\n        } else {\n            int tp = s.top();\n            s.pop();\n            int area = heights[tp] * (s.empty() ? i : i - s.top() - 1);\n            max_area = max(max_area, area);\n        }\n    }\n\n    while (!s.empty()) {\n        int tp = s.top();\n        s.pop();\n        int area = heights[tp] * (s.empty() ? i : i - s.top() - 1);\n        max_area = max(max_area, area);\n    }\n\n    cout << max_area << endl;\n    return 0;\n}\n",
+            "passed_test_cases": 7,
+            "total_test_cases": 11,
+            "mean_time_taken": 0.10503337600014427,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "",
+                "",
+                "",
+                ""
+            ],
+            "failed_test_cases": [
+                2,
+                4,
+                6,
+                8
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 1,
+            "passed": false,
+            "shots_info": {
+                "shot": 2,
+                "status": "failed"
+            }
+        }
+    ],
+    "total_passed_problems": 1,
+    "initial_config": {
+        "ignore_time_limits": true,
+        "model": "gpt-4o",
+        "provider": "openai",
+        "categories": [],
+        "shots": 2
+    }
+}

@@ -4,6 +4,7 @@ from tqdm import tqdm
 from pydantic import ValidationError
 from datasets import load_dataset
 from judges.cpp_judge import CppJudge
+from judges.python_judge import PythonJudge
 from utils.logger import Logger, JSONLogger
 from utils.models import Problem, Config
 from utils.utils import sanitize_filename
@@ -34,31 +35,31 @@ def load_existing_log(log_filename: str) -> dict:
 
 def initialize_provider(config: Config, logger: Logger):
     if config.provider == "openai":
-        return OpenAIProvider(config.api_key, config.model, config.base_prompt, logger)
+        return OpenAIProvider(config.api_key, config.model, config.base_prompt, logger, config.language)
     elif config.provider == "huggingface":
-        return HuggingFaceProvider(config.model, config.base_prompt, logger)
+        return HuggingFaceProvider(config.model, config.base_prompt, logger, config.language)
     elif config.provider == "anthropic":
-        return AnthropicProvider(config.api_key, config.model, config.base_prompt, logger)
+        return AnthropicProvider(config.api_key, config.model, config.base_prompt, logger, config.language)
     elif config.provider == "mistral":
-        return MistralProvider(config.api_key, config.model, config.base_prompt, logger)
+        return MistralProvider(config.api_key, config.model, config.base_prompt, logger, config.language)
     else:
         logger.log('error', "Invalid provider specified")
         raise ValueError("Invalid provider specified")
 
-def process_problem(judge: CppJudge, provider, problem_data: dict, shots: int, ignore_time_limits: bool, json_logger: JSONLogger, logger: Logger, problems_passed: int, total_filtered_problems: int, index: int) -> int:
+def process_problem(judge, provider, problem_data: dict, shots: int, ignore_time_limits: bool, json_logger: JSONLogger, logger: Logger, problems_passed: int, total_filtered_problems: int, index: int) -> int:
     problem_title = problem_data['title']
     sanitized_title = sanitize_filename(problem_title)
     
     for shot in range(1, shots + 1):
-        cpp_file = os.path.join("temp", f"{sanitized_title}_shot_{shot}.cpp")
+        source_file = os.path.join("temp", f"{sanitized_title}_shot_{shot}.{judge.language_extension}")
         binary_file = os.path.join("temp", f"{sanitized_title}_binary_shot_{shot}")
-        
+
         solution = provider.generate_solution(problem_data)
         if solution:
-            with open(cpp_file, 'w') as file:
+            with open(source_file, 'w') as file:
                 file.write(solution)
             
-            if judge.compile_code(cpp_file, binary_file):
+            if judge.compile_code(source_file, binary_file):
                 try:
                     problem = Problem(**problem_data)
                     results = judge.judge_problem(problem, binary_file, ignore_time_limits)
@@ -79,8 +80,8 @@ def process_problem(judge: CppJudge, provider, problem_data: dict, shots: int, i
             logger.log('error', "Solution generation failed")
             json_logger.log_compilation_error(problem_data["title"], problem_data.get("category", "Uncategorized"), "No solution generated", "Solution generation failed", problems_passed, shot)
 
-        if os.path.exists(cpp_file):
-            os.remove(cpp_file)
+        if os.path.exists(source_file):
+            os.remove(source_file)
         if os.path.exists(binary_file):
             os.remove(binary_file)
     
@@ -109,7 +110,14 @@ def main():
     shots = config.shots
     ignore_time_limits = config.ignore_time_limits
     
-    judge = CppJudge(logger)
+    if config.language == "cpp":
+        judge = CppJudge(logger)
+    elif config.language == "python":
+        judge = PythonJudge(logger)
+    else:
+        logger.log('error', "Unsupported language specified")
+        raise ValueError("Unsupported language specified")
+        
     provider = initialize_provider(config, logger)
 
     if categories_filter:
