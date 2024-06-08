@@ -41,3 +41,4 @@ class Config(BaseModel):
     base_prompt: str = "You are a helpful assistant."
     categories: Optional[List[str]] = None
     shots: int = 1
+    continue_from_log: Optional[str] = None  

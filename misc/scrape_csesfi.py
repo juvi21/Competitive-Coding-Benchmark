@@ -6,11 +6,9 @@ import zipfile
 import json
 from tqdm import tqdm
 
-# Base URLs for the tasks and zip files
 base_task_url = 'https://cses.fi/problemset/task/'
 base_zip_url = 'https://cses.fi/problemset/tests/'
 
-# Cookies and headers to mimic the browser behavior
 cookies = {
     'PHPSESSID': '78dfdd26847d32244c766a0a7c079e55faca0df0',
 }
@@ -30,13 +28,11 @@ headers = {
     'Sec-Fetch-User': '?1',
 }
 
-# Data for the POST request to download the zip file
 data = {
     'csrf_token': '43cd7e7c24de820adfcb438241cb1072',
     'download': 'true',
 }
 
-# Folder to save the problems and zip files
 folder_name = 'problems'
 if not os.path.exists(folder_name):
     os.makedirs(folder_name)
@@ -44,11 +40,9 @@ if not os.path.exists(folder_name):
 def extract_problem_details(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
 
-    # Extract problem title
     title_tag = soup.find('title')
     problem_title = title_tag.text.replace("CSES - ", "").strip() if title_tag else "Task"
 
-    # Extract constraints
     constraints = soup.find('ul', class_='task-constraints')
     time_limit = memory_limit = "Not found"
     if constraints:
@@ -57,11 +51,9 @@ def extract_problem_details(html_content):
         time_limit = time_limit_tag.text.replace("Time limit:", "").strip() if time_limit_tag else "Not found"
         memory_limit = memory_limit_tag.text.replace("Memory limit:", "").strip() if memory_limit_tag else "Not found"
 
-    # Extract problem statement
     content_div = soup.find('div', class_='md')
     problem_statement = content_div.text.strip() if content_div else "No problem statement found"
 
-    # Extract input, output, constraints, and example sections
     input_section = output_section = constraints_section = "Not found"
     example_section = {"input": "Not found", "output": "Not found"}
     if content_div:
@@ -81,7 +73,6 @@ def extract_problem_details(html_content):
                 example_output = header.find_next_sibling('pre').find_next_sibling('pre').text.strip()
                 example_section = {"input": example_input, "output": example_output}
 
-    # Transcribe inline math elements into Markdown
     problem_statement = transcribe_math(problem_statement)
     input_section = transcribe_math(input_section)
     output_section = transcribe_math(output_section)

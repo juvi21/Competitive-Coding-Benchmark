@@ -1,6 +1,5 @@
 import json
 
-# Define the problem categories and their associated titles
 categories = {
     "Introductory Problems": [
         "Weird Algorithm", "Missing Number", "Repetitions", "Increasing Array", "Permutations", 
@@ -83,7 +82,6 @@ categories = {
     ]
 }
 
-# Read and parse the JSONL file
 problems = []
 
 with open('problems.jsonl', 'r') as f:
@@ -91,17 +89,14 @@ with open('problems.jsonl', 'r') as f:
         problem = json.loads(line)
         problems.append(problem)
 
-# Add category to each problem
 for problem in problems:
     for category, titles in categories.items():
         if problem['title'] in titles:
             problem['category'] = category
             break
 
-# Sort the problems by title
 problems = sorted(problems, key=lambda x: x['title'])
 
-# Write the updated problems back to JSONL
 with open('sorted_problems.jsonl', 'w') as f:
     for problem in problems:
         f.write(json.dumps(problem) + '\n')

@@ -1,5 +1,6 @@
 import logging
 import json
+import os
 
 class Logger:
     def __init__(self, name="JudgeLogger", level=logging.INFO):
@@ -25,10 +26,26 @@ class Logger:
 class JSONLogger:
     def __init__(self, filename):
         self.filename = filename
-        self.data = {
-            "problems": [],
-            "total_passed_problems": 0
+        if os.path.exists(self.filename):
+            with open(self.filename, 'r') as file:
+                self.data = json.load(file)
+        else:
+            self.data = {
+                "problems": [],
+                "total_passed_problems": 0
+            }
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(self.filename), exist_ok=True)
+
+    def log_initial_config(self, config):
+        self.data["initial_config"] = {
+            "ignore_time_limits": config.ignore_time_limits,
+            "model": config.model,
+            "provider": config.provider,
+            "categories": config.categories,
+            "shots": config.shots
         }
+        self._write_log()
 
     def log_problem(self, title, category, results, solution, total_problems_passed, shots_info):
         passed_count = sum(1 for result in results if result['pass'])
@@ -55,7 +72,7 @@ class JSONLogger:
             "exceeded_memory_count": exceeded_memory_count,
             "total_problems_passed": total_problems_passed,
             "passed": problem_passed,
-            "shots_info": shots_info  # Add shot information
+            "shots_info": shots_info
         }
         self.data["problems"].append(problem_log)
         if problem_passed:
@@ -77,7 +94,7 @@ class JSONLogger:
             "exceeded_memory_count": 0,
             "total_problems_passed": total_problems_passed,
             "passed": False,
-            "shot": shot  # Log which shot failed
+            "shot": shot
         }
         self.data["problems"].append(problem_log)
         self._write_log()

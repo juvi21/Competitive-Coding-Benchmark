@@ -1,15 +1,15 @@
-import json
 import os
+import json
 from tqdm import tqdm
+from pydantic import ValidationError
+from datasets import load_dataset
 from judges.cpp_judge import CppJudge
 from utils.logger import Logger, JSONLogger
 from utils.models import Problem, Config
+from utils.utils import sanitize_filename
 from providers.openai import OpenAIProvider
 from providers.huggingface import HuggingFaceProvider
-from providers.anthropic import AnthropicProvider  # Import AnthropicProvider
-from utils.utils import sanitize_filename
-from pydantic import ValidationError
-from datasets import load_dataset
+from providers.anthropic import AnthropicProvider
 
 def load_problems_from_hf(dataset_name: str, split: str = 'train') -> list[str]:
     dataset = load_dataset(dataset_name, split=split)
@@ -26,17 +26,32 @@ def generate_summary(results: list[dict]) -> str:
     total_count = len(results)
     return f"Passed {passed_count}/{total_count} test cases"
 
+def load_existing_log(log_filename: str) -> dict:
+    if os.path.exists(log_filename):
+        with open(log_filename, 'r') as file:
+            return json.load(file)
+    return {}
+
 def main():
     logger = Logger()
-    json_logger = JSONLogger('log.json')
     
-    # Load problems from Hugging Face dataset
-    problems = load_problems_from_hf("juvi21/cses-fi-competitive-coding-problems")
     config = load_config('config.json')
+
+    # Create the benchmark and temp directories if they don't exist
+    os.makedirs("benchmark", exist_ok=True)
+    os.makedirs("temp", exist_ok=True)
+
+    log_filename = os.path.join("benchmark", f"{sanitize_filename(config.provider)}_{sanitize_filename(config.model)}_log.json")
+    json_logger = JSONLogger(log_filename)
+    
+    if not config.continue_from_log:
+        json_logger.log_initial_config(config)
+    
+    problems = load_problems_from_hf("juvi21/cses-fi-competitive-coding-problems")
     
     ignore_time_limits = config.ignore_time_limits
-    categories_filter = config.categories  # Get the categories from the config
-    shots = config.shots  # Get the number of shots from the config
+    categories_filter = config.categories  
+    shots = config.shots  
 
     judge = CppJudge(logger)
     
@@ -54,19 +69,25 @@ def main():
         filtered_problems = problems
 
     total_filtered_problems = len(filtered_problems)
-    problems_passed = 0
+    problems_passed = json_logger.data.get("total_passed_problems", 0)
+    
+    processed_titles = set(problem["title"] for problem in json_logger.data.get("problems", []))
 
     for index, problem_str in enumerate(tqdm(filtered_problems, desc="Processing problems")):
         problem_data = json.loads(problem_str)
         problem_title = problem_data['title']
-        sanitized_title = sanitize_filename(problem_title)  # Sanitize the problem title for file names
+        
+        if problem_title in processed_titles:
+            logger.log('info', f"Skipping already processed problem: {problem_title}")
+            continue
+
+        sanitized_title = sanitize_filename(problem_title)
         logger.log('info', f"Judging problem: {problem_title}")
 
         for shot in range(1, shots + 1):
-            cpp_file = f"{sanitized_title}_shot_{shot}.cpp"
-            binary_file = f"./{sanitized_title}_binary_shot_{shot}"
+            cpp_file = os.path.join("temp", f"{sanitized_title}_shot_{shot}.cpp")
+            binary_file = os.path.join("temp", f"{sanitized_title}_binary_shot_{shot}")
 
-            # Generate a solution using the provider
             if provider:
                 solution = provider.generate_solution(problem_data)
                 if solution:

@@ -1,0 +1,68 @@
+{
+    "problems": [
+        {
+            "title": "Acyclic Graph Edges",
+            "category": "Additional Problems",
+            "solution": "#include<bits/stdc++.h>\nusing namespace std;\n\nconst int MAX_N = 1e5 + 5;\nvector<int> adj[MAX_N];\nbool visited[MAX_N];\nvector<pair<int, int>> edges;\n\nvoid dfs(int u) {\n    visited[u] = true;\n    for (int v : adj[u]) {\n        if (!visited[v]) {\n            edges.push_back({u, v});\n            dfs(v);\n        }\n    }\n}\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n    for (int i = 0; i < m; ++i) {\n        int a, b;\n        cin >> a >> b;\n        adj[a].push_back(b);\n        adj[b].push_back(a);\n    }\n    memset(visited, false, sizeof visited);\n    for (int i = 1; i <= n; ++i) {\n        if (!visited[i]) {\n            dfs(i);\n        }\n    }\n    for (auto e : edges) {\n        cout << e.first << \" \" << e.second << \"\\n\";\n    }\n    return 0;\n}",
+            "passed_test_cases": 1,
+            "total_test_cases": 4,
+            "mean_time_taken": 0.1126716136932373,
+            "mean_memory_used": 7745396.0,
+            "failure_reasons": [
+                "",
+                "",
+                ""
+            ],
+            "failed_test_cases": [
+                1,
+                2,
+                3
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 0,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Advertisement",
+            "category": "Additional Problems",
+            "solution": "#include<bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int n;\n    cin >> n;\n    vector<int> h(n+2);\n    for(int i = 1; i <= n; i++) {\n        cin >> h[i];\n    }\n    stack<int> s;\n    int ans = 0;\n    for(int i = 0; i < n+2; i++) {\n        while(!s.empty() && h[s.top()] > h[i]) {\n            int j = s.top();\n            s.pop();\n            ans = max(ans, h[j]*(i-s.top()-1));\n        }\n        s.push(i);\n    }\n    cout << ans << \"\\n\";\n    \n    return 0;\n}",
+            "passed_test_cases": 7,
+            "total_test_cases": 11,
+            "mean_time_taken": 0.0884345444765958,
+            "mean_memory_used": 7745396.0,
+            "failure_reasons": [
+                "",
+                "",
+                "",
+                ""
+            ],
+            "failed_test_cases": [
+                2,
+                4,
+                6,
+                8
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 0,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        }
+    ],
+    "total_passed_problems": 0,
+    "initial_config": {
+        "ignore_time_limits": false,
+        "model": "gpt-4",
+        "provider": "openai",
+        "categories": [],
+        "shots": 1
+    }
+}
