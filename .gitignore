@@ -4,3 +4,4 @@ __pycache__/
 log.json
 config.json
 config_openai.json
+temp/

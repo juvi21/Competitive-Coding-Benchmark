@@ -2373,9 +2373,92 @@
                 "shot": 1,
                 "status": "passed"
             }
+        },
+        {
+            "title": "Edit Distance",
+            "category": "Dynamic Programming",
+            "solution": "#include <iostream>\n#include <vector>\n#include <algorithm>\n\nusing namespace std;\n\nint editDistance(const string& str1, const string& str2) {\n    int n = str1.size();\n    int m = str2.size();\n\n    // Create a 2D DP array\n    vector<vector<int>> dp(n + 1, vector<int>(m + 1));\n\n    // Initialization\n    for (int i = 0; i <= n; ++i) {\n        dp[i][0] = i;\n    }\n    for (int j = 0; j <= m; ++j) {\n        dp[0][j] = j;\n    }\n\n    // Fill the DP table\n    for (int i = 1; i <= n; ++i) {\n        for (int j = 1; j <= m; ++j) {\n            if (str1[i - 1] == str2[j - 1]) {\n                dp[i][j] = dp[i - 1][j - 1];\n            } else {\n                dp[i][j] = 1 + min({ dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1] });\n            }\n        }\n    }\n\n    // The result is in the bottom-right corner of the DP table\n    return dp[n][m];\n}\n\nint main() {\n    string str1, str2;\n    cin >> str1 >> str2;\n    cout << editDistance(str1, str2) << endl;\n    return 0;\n}\n",
+            "passed_test_cases": 17,
+            "total_test_cases": 17,
+            "mean_time_taken": 0.2960008452920353,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [],
+            "failed_test_cases": [],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 27,
+            "passed": true,
+            "shots_info": {
+                "shot": 1,
+                "status": "passed"
+            }
+        },
+        {
+            "title": "Elevator Rides",
+            "category": "Dynamic Programming",
+            "solution": "#include <iostream>\n#include <vector>\n#include <algorithm>\n#include <climits>\nusing namespace std;\n\nint main() {\n    int n, x;\n    cin >> n >> x;\n    vector<int> weights(n);\n    for (int i = 0; i < n; i++) {\n        cin >> weights[i];\n    }\n\n    // dp[mask] will contain a pair {number_of_rides, current_weight}\n    // Initialize the dp array with maximum possible rides\n    vector<pair<int, int>> dp(1<<n, {n+1, 0});\n    dp[0] = {1, 0}; // Base case: no people, one ride with 0 weight\n\n    for (int mask = 0; mask < (1<<n); mask++) {\n        for (int i = 0; i < n; i++) {\n            if (!(mask & (1<<i))) {\n                // If i-th person is not in the current subset\n                int next_mask = mask | (1<<i);\n                if (dp[mask].second + weights[i] <= x) {\n                    // Add the person to the current ride\n                    dp[next_mask] = min(dp[next_mask], {dp[mask].first, dp[mask].second + weights[i]});\n                } else {\n                    // Start a new ride for this person\n                    dp[next_mask] = min(dp[next_mask], {dp[mask].first + 1, weights[i]});\n                }\n            }\n        }\n    }\n\n    // The answer will be in dp[(1<<n) - 1]\n    cout << dp[(1<<n) - 1].first << endl;\n\n    return 0;\n}\n",
+            "passed_test_cases": 39,
+            "total_test_cases": 39,
+            "mean_time_taken": 0.2567297189663618,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [],
+            "failed_test_cases": [],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 28,
+            "passed": true,
+            "shots_info": {
+                "shot": 1,
+                "status": "passed"
+            }
+        },
+        {
+            "title": "Empty String",
+            "category": "Additional Problems",
+            "solution": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nconst int MOD = 1e9 + 7;\n\nint main() {\n    string s;\n    cin >> s;\n    int n = s.length();\n    \n    vector<vector<long long>> dp(n, vector<long long>(n, 0));\n    \n    for (int length = 1; length <= n; ++length) {\n        for (int i = 0; i <= n - length; ++i) {\n            int j = i + length - 1;\n            if (length == 1) {\n                dp[i][j] = 1;\n            } else {\n                if (s[i] == s[j]) {\n                    dp[i][j] = dp[i+1][j-1];\n                }\n                for (int k = i; k < j; ++k) {\n                    dp[i][j] = (dp[i][j] + dp[i][k] * dp[k+1][j] % MOD) % MOD;\n                }\n            }\n        }\n    }\n    \n    cout << dp[0][n-1] << endl;\n    \n    return 0;\n}\n",
+            "passed_test_cases": 0,
+            "total_test_cases": 12,
+            "mean_time_taken": 0.17378983894983926,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed"
+            ],
+            "failed_test_cases": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 28,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
         }
     ],
-    "total_passed_problems": 26,
+    "total_passed_problems": 28,
     "initial_config": {
         "ignore_time_limits": false,
         "model": "gpt-4o",
