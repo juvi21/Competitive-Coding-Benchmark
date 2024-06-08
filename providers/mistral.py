@@ -1,17 +1,19 @@
+import os
 import re
-from transformers import pipeline
+from mistralai.client import MistralClient
+from mistralai.models.chat_completion import ChatMessage
 from providers.base import BaseProvider
 from utils.logger import Logger
 
-class HuggingFaceProvider(BaseProvider):
-    def __init__(self, model: str, base_prompt: str, logger: Logger):
+class MistralProvider(BaseProvider):
+    def __init__(self, api_key: str, model: str, base_prompt: str, logger: Logger):
         super().__init__(logger)
+        self.client = MistralClient(api_key=api_key)
         self.model = model
         self.base_prompt = base_prompt
-        self.generator = pipeline('text-generation', model=model)
 
     def generate_solution(self, problem: dict) -> str:
-        self.logger.log('info', f"Generating solution using HuggingFace model {self.model}")
+        self.logger.log('info', f"Generating solution using Mistral model {self.model}")
 
         prompt = (
             f"{self.base_prompt}\n"
@@ -25,8 +27,16 @@ class HuggingFaceProvider(BaseProvider):
             f"\nProvide the solution in a markdown cpp block.\n"
         )
 
-        response = self.generator(prompt, max_length=1500, num_return_sequences=1)
-        raw_solution = response[0]['generated_text'].strip()
+        messages = [
+            ChatMessage(role="user", content=prompt)
+        ]
+
+        response = self.client.chat(
+            model=self.model,
+            messages=messages
+        )
+        
+        raw_solution = response.choices[0].message.content.strip()
         self.logger.log('info', f"Generated raw solution: {raw_solution}")
 
         cpp_code_match = re.search(r"```cpp(.*?)```", raw_solution, re.DOTALL)
