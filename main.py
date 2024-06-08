@@ -91,11 +91,15 @@ def main():
     os.makedirs("temp", exist_ok=True)
 
     log_filename = os.path.join("benchmark", f"{sanitize_filename(config.provider)}_{sanitize_filename(config.model)}_log.json")
-    json_logger = JSONLogger(log_filename)
-
+    
     if not config.continue_from_log:
+        if os.path.exists(log_filename):
+            os.remove(log_filename)
+        json_logger = JSONLogger(log_filename)
         json_logger.log_initial_config(config)
-
+    else:
+        json_logger = JSONLogger(log_filename)
+    
     problems = load_problems_from_hf("juvi21/cses-fi-competitive-coding-problems")
     
     categories_filter = config.categories  
