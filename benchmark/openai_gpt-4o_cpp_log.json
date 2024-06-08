@@ -2585,9 +2585,254 @@
                 "shot": 1,
                 "status": "passed"
             }
+        },
+        {
+            "title": "Ferris Wheel",
+            "category": "Sorting and Searching",
+            "solution": "#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint main() {\n    int n, x;\n    std::cin >> n >> x;\n    std::vector<int> weights(n);\n    \n    for (int i = 0; i < n; ++i) {\n        std::cin >> weights[i];\n    }\n    \n    std::sort(weights.begin(), weights.end());\n    \n    int left = 0;\n    int right = n - 1;\n    int gondolas = 0;\n    \n    while (left <= right) {\n        if (weights[left] + weights[right] <= x) {\n            ++left;\n            --right;\n        } else {\n            --right;\n        }\n        ++gondolas;\n    }\n    \n    std::cout << gondolas << std::endl;\n    \n    return 0;\n}\n",
+            "passed_test_cases": 13,
+            "total_test_cases": 13,
+            "mean_time_taken": 0.1315455069908729,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [],
+            "failed_test_cases": [],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 31,
+            "passed": true,
+            "shots_info": {
+                "shot": 1,
+                "status": "passed"
+            }
+        },
+        {
+            "title": "Fibonacci Numbers",
+            "category": "Mathematics",
+            "solution": "#include <iostream>\n#include <vector>\n\nconst int MOD = 1'000'000'007;\n\nusing namespace std;\n\n// Function to multiply two 2x2 matrices under modulo\nvector<vector<long long>> matrixMultiply(const vector<vector<long long>>& A, const vector<vector<long long>>& B) {\n    vector<vector<long long>> C(2, vector<long long>(2));\n    C[0][0] = (A[0][0] * B[0][0] % MOD + A[0][1] * B[1][0] % MOD) % MOD;\n    C[0][1] = (A[0][0] * B[0][1] % MOD + A[0][1] * B[1][1] % MOD) % MOD;\n    C[1][0] = (A[1][0] * B[0][0] % MOD + A[1][1] * B[1][0] % MOD) % MOD;\n    C[1][1] = (A[1][0] * B[0][1] % MOD + A[1][1] * B[1][1] % MOD) % MOD;\n    return C;\n}\n\n// Function to exponentiate a 2x2 matrix using binary exponentiation\nvector<vector<long long>> matrixPower(vector<vector<long long>> base, long long exp) {\n    vector<vector<long long>> result = {{1, 0}, {0, 1}};\n    while (exp > 0) {\n        if (exp % 2 == 1) {\n            result = matrixMultiply(result, base);\n        }\n        base = matrixMultiply(base, base);\n        exp /= 2;\n    }\n    return result;\n}\n\nlong long fibonacci(long long n) {\n    if (n == 0) return 0;\n    vector<vector<long long>> F = {{1, 1}, {1, 0}};\n    vector<vector<long long>> result = matrixPower(F, n - 1);\n    return result[0][0];\n}\n\nint main() {\n    long long n;\n    cin >> n;\n    cout << fibonacci(n) << endl;\n    return 0;\n}\n",
+            "passed_test_cases": 12,
+            "total_test_cases": 12,
+            "mean_time_taken": 0.09031039476394653,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [],
+            "failed_test_cases": [],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 32,
+            "passed": true,
+            "shots_info": {
+                "shot": 1,
+                "status": "passed"
+            }
+        },
+        {
+            "title": "Filling Trominos",
+            "category": "Additional Problems",
+            "solution": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nvoid solve() {\n    int t;\n    cin >> t;\n    while (t--) {\n        int n, m;\n        cin >> n >> m;\n        \n        if ((n * m) % 3 != 0) {\n            cout << \"NO\" << endl;\n            continue;\n        }\n        \n        vector<vector<char>> grid(n, vector<char>(m, '.'));\n        char currentChar = 'A';\n        \n        for (int i = 0; i < n; i += 2) {\n            for (int j = 0; j < m; j += 3) {\n                if (i + 1 < n && j + 2 < m) {\n                    grid[i][j] = currentChar;\n                    grid[i][j + 1] = currentChar;\n                    grid[i + 1][j + 1] = currentChar;\n                    grid[i + 1][j + 2] = currentChar;\n                    currentChar = (currentChar == 'Z' ? 'A' : currentChar + 1);\n                }\n            }\n        }\n        \n        cout << \"YES\" << endl;\n        for (int i = 0; i < n; ++i) {\n            for (int j = 0; j < m; ++j) {\n                cout << grid[i][j];\n            }\n            cout << endl;\n        }\n    }\n}\n\nint main() {\n    solve();\n    return 0;\n}\n",
+            "passed_test_cases": 0,
+            "total_test_cases": 4,
+            "mean_time_taken": 0.10075300931930542,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed"
+            ],
+            "failed_test_cases": [
+                1,
+                2,
+                3,
+                4
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 32,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Finding Borders",
+            "category": "String Algorithms",
+            "solution": "#include <iostream>\n#include <vector>\n#include <string>\nusing namespace std;\n\nvector<int> computePrefixFunction(const string& s) {\n    int n = s.length();\n    vector<int> pi(n);\n    for (int i = 1; i < n; ++i) {\n        int j = pi[i - 1];\n        while (j > 0 && s[i] != s[j]) {\n            j = pi[j - 1];\n        }\n        if (s[i] == s[j]) {\n            ++j;\n        }\n        pi[i] = j;\n    }\n    return pi;\n}\n\nvector<int> findBorders(const string& s) {\n    vector<int> borders;\n    vector<int> pi = computePrefixFunction(s);\n    int n = s.length();\n    int k = pi[n - 1];\n    while (k > 0) {\n        borders.push_back(k);\n        k = pi[k - 1];\n    }\n    reverse(borders.begin(), borders.end());\n    return borders;\n}\n\nint main() {\n    string s;\n    cin >> s;\n    vector<int> borders = findBorders(s);\n    for (int length : borders) {\n        cout << length << \" \";\n    }\n    cout << endl;\n    return 0;\n}\n",
+            "passed_test_cases": 0,
+            "total_test_cases": 0,
+            "mean_time_taken": 0,
+            "mean_memory_used": 0,
+            "failure_reasons": [
+                "Compilation failed"
+            ],
+            "failed_test_cases": [],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 32,
+            "passed": false,
+            "shot": 1
+        },
+        {
+            "title": "Finding Patterns",
+            "category": "String Algorithms",
+            "solution": "#include <iostream>\n#include <vector>\n#include <queue>\n#include <unordered_map>\nusing namespace std;\n\nstruct TrieNode {\n    unordered_map<char, TrieNode*> children;\n    TrieNode* failureLink;\n    vector<int> output;\n};\n\nclass AhoCorasick {\npublic:\n    AhoCorasick() {\n        root = new TrieNode();\n    }\n\n    void insert(const string& pattern, int index) {\n        TrieNode* node = root;\n        for (char c : pattern) {\n            if (!node->children.count(c)) {\n                node->children[c] = new TrieNode();\n            }\n            node = node->children[c];\n        }\n        node->output.push_back(index);\n    }\n\n    void buildFailureLinks() {\n        queue<TrieNode*> q;\n        for (auto& pair : root->children) {\n            pair.second->failureLink = root;\n            q.push(pair.second);\n        }\n\n        while (!q.empty()) {\n            TrieNode* current = q.front();\n            q.pop();\n\n            for (auto& pair : current->children) {\n                char c = pair.first;\n                TrieNode* child = pair.second;\n                TrieNode* failure = current->failureLink;\n\n                while (failure != nullptr && !failure->children.count(c)) {\n                    failure = failure->failureLink;\n                }\n                if (failure == nullptr) {\n                    child->failureLink = root;\n                } else {\n                    child->failureLink = failure->children[c];\n                    child->output.insert(child->output.end(), child->failureLink->output.begin(), child->failureLink->output.end());\n                }\n                q.push(child);\n            }\n        }\n    }\n\n    vector<bool> search(const string& text, int k) {\n        vector<bool> results(k, false);\n        TrieNode* node = root;\n\n        for (char c : text) {\n            while (node != nullptr && !node->children.count(c)) {\n                node = node->failureLink;\n            }\n            if (node == nullptr) {\n                node = root;\n                continue;\n            }\n            node = node->children[c];\n            for (int index : node->output) {\n                results[index] = true;\n            }\n        }\n\n        return results;\n    }\n\nprivate:\n    TrieNode* root;\n};\n\nint main() {\n    string text;\n    cin >> text;\n    int k;\n    cin >> k;\n    vector<string> patterns(k);\n    for (int i = 0; i < k; ++i) {\n        cin >> patterns[i];\n    }\n\n    AhoCorasick ac;\n\n    for (int i = 0; i < k; ++i) {\n        ac.insert(patterns[i], i);\n    }\n\n    ac.buildFailureLinks();\n\n    vector<bool> results = ac.search(text, k);\n\n    for (bool found : results) {\n        if (found) {\n            cout << \"YES\" << endl;\n        } else {\n            cout << \"NO\" << endl;\n        }\n    }\n\n    return 0;\n}\n",
+            "passed_test_cases": 13,
+            "total_test_cases": 17,
+            "mean_time_taken": 0.44894761197707234,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed"
+            ],
+            "failed_test_cases": [
+                1,
+                3,
+                5,
+                14
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 32,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Finding Periods",
+            "category": "String Algorithms",
+            "solution": "#include <iostream>\n#include <vector>\n#include <string>\n\nstd::vector<int> computePrefixFunction(const std::string& s) {\n    int n = s.length();\n    std::vector<int> pi(n, 0);\n    for (int i = 1; i < n; ++i) {\n        int j = pi[i-1];\n        while (j > 0 && s[i] != s[j]) {\n            j = pi[j-1];\n        }\n        if (s[i] == s[j]) {\n            ++j;\n        }\n        pi[i] = j;\n    }\n    return pi;\n}\n\nstd::vector<int> findPeriods(const std::string& s) {\n    std::vector<int> pi = computePrefixFunction(s);\n    int n = s.length();\n    std::vector<int> periods;\n    for (int i = 0; i < n; ++i) {\n        int len = i + 1;\n        int k = pi[i];\n        if (len % (len - k) == 0) {\n            periods.push_back(len);\n        }\n    }\n    return periods;\n}\n\nint main() {\n    std::string s;\n    std::cin >> s;\n    \n    std::vector<int> periods = findPeriods(s);\n    for (int period : periods) {\n        std::cout << period << \" \";\n    }\n    std::cout << std::endl;\n    \n    return 0;\n}\n",
+            "passed_test_cases": 2,
+            "total_test_cases": 14,
+            "mean_time_taken": 0.11804212842668806,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed"
+            ],
+            "failed_test_cases": [
+                2,
+                3,
+                4,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 32,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Finding a Centroid",
+            "category": "Tree Algorithms",
+            "solution": "#include <iostream>\n#include <vector>\n\nusing namespace std;\n\nconst int MAXN = 2e5 + 5;\nvector<int> tree[MAXN];\nint subtree_size[MAXN];\nint n;\n\nvoid dfs(int node, int parent) {\n    subtree_size[node] = 1; // Initially, the size of the current subtree is 1 (the node itself)\n    for (int neighbor : tree[node]) {\n        if (neighbor != parent) {\n            dfs(neighbor, node);\n            subtree_size[node] += subtree_size[neighbor];\n        }\n    }\n}\n\nint find_centroid(int node, int parent) {\n    for (int neighbor : tree[node]) {\n        if (neighbor != parent && subtree_size[neighbor] > n / 2) {\n            return find_centroid(neighbor, node);\n        }\n    }\n    return node;\n}\n\nint main() {\n    cin >> n;\n    for (int i = 1; i < n; ++i) {\n        int a, b;\n        cin >> a >> b;\n        tree[a].push_back(b);\n        tree[b].push_back(a);\n    }\n\n    // Start DFS from node 1 (assuming nodes are 1-indexed)\n    dfs(1, -1);\n\n    // Find centroid\n    int centroid = find_centroid(1, -1);\n\n    cout << centroid << endl;\n    return 0;\n}\n",
+            "passed_test_cases": 14,
+            "total_test_cases": 16,
+            "mean_time_taken": 0.1438102126121521,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "Failed",
+                "Failed"
+            ],
+            "failed_test_cases": [
+                5,
+                13
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 32,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Fixed-Length Paths I",
+            "category": "Tree Algorithms",
+            "solution": "#include <iostream>\n#include <vector>\n#include <cstring>\n\nusing namespace std;\n\nconst int MAXN = 200005;\nvector<int> tree[MAXN];\nlong long dp[MAXN][6];  // dp[node][length] will store paths of specific length from the node\nint n, k;\n\nvoid dfs(int node, int parent) {\n    dp[node][0] = 1;  // There's always one way to stay at the node itself\n\n    for (int neighbor : tree[node]) {\n        if (neighbor == parent) continue;\n        dfs(neighbor, node);\n\n        for (int i = 1; i <= k; ++i) {\n            dp[node][i] += dp[neighbor][i - 1];\n        }\n    }\n}\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(0);\n\n    cin >> n >> k;\n    for (int i = 1; i < n; ++i) {\n        int a, b;\n        cin >> a >> b;\n        tree[a].push_back(b);\n        tree[b].push_back(a);\n    }\n\n    memset(dp, 0, sizeof(dp));\n    dfs(1, -1);\n\n    long long result = 0;\n    for (int node = 1; node <= n; ++node) {\n        result += dp[node][k];\n        for (int neighbor : tree[node]) {\n            if (dp[neighbor][k - 1] > 0) {\n                result -= dp[neighbor][k - 1];\n            }\n        }\n    }\n\n    cout << result / 2 << endl;  // Each path is counted twice\n\n    return 0;\n}\n",
+            "passed_test_cases": 0,
+            "total_test_cases": 20,
+            "mean_time_taken": 0.23264930248260499,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed"
+            ],
+            "failed_test_cases": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 32,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
         }
     ],
-    "total_passed_problems": 30,
+    "total_passed_problems": 32,
     "initial_config": {
         "ignore_time_limits": false,
         "model": "gpt-4o",
