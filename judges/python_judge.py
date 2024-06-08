@@ -17,7 +17,7 @@ class PythonJudge(BaseJudge):
         tracker.start()
 
         try:
-            result = subprocess.run(['python3', binary_path], input=input_data, text=True,
+            result = subprocess.run(['python', binary_path], input=input_data, text=True,
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
                                     preexec_fn=lambda: tracker.set_limits(time_limit, memory_limit) if not ignore_time_limits else None, 
                                     timeout=None if ignore_time_limits else time_limit)
@@ -30,4 +30,4 @@ class PythonJudge(BaseJudge):
                 "memory_used": memory_used
             }
         except subprocess.TimeoutExpired:
-            return {"success": False, "output": "", "error": "Time limit exceeded", "time_taken": time_limit, "memory_used": 0}
+            return {"success": False, "output": "", "error": "Time limit exceeded", "time_taken": time_limit, "memory_used": memory_used}

@@ -2,6 +2,7 @@ import anthropic
 from providers.base import BaseProvider
 from utils.logger import Logger
 
+# EXPERIMENTAL
 class AnthropicProvider(BaseProvider):
     def __init__(self, api_key: str, model: str, base_prompt: str, logger: Logger, language: str):
         super().__init__(logger, language)

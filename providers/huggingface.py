@@ -2,6 +2,7 @@ from transformers import pipeline
 from providers.base import BaseProvider
 from utils.logger import Logger
 
+#EXPERIMENTAL
 class HuggingFaceProvider(BaseProvider):
     def __init__(self, model: str, base_prompt: str, logger: Logger, language: str):
         super().__init__(logger, language)

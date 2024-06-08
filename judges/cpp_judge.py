@@ -38,7 +38,7 @@ class CppJudge(BaseJudge):
                 "memory_used": memory_used
             }
         except subprocess.TimeoutExpired:
-            return {"success": False, "output": "", "error": "Time limit exceeded", "time_taken": time_limit, "memory_used": 0}
+            return {"success": False, "output": "", "error": "Time limit exceeded", "time_taken": time_limit, "memory_used": memory_used}
         except MemoryError:
             return {"success": False, "output": "", "error": "Memory limit exceeded", "time_taken": 0, "memory_used": memory_limit}
         except FileNotFoundError as e:

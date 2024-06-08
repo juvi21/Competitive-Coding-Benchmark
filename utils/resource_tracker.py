@@ -9,13 +9,13 @@ class ResourceTracker:
 
     def start(self):
         self.start_time = time.time()
-        self.start_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        self.start_memory = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
 
     def stop(self):
         end_time = time.time()
-        end_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        end_memory = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
         time_taken = end_time - self.start_time
-        memory_used = end_memory - self.start_memory
+        memory_used = (end_memory - self.start_memory) if end_memory >= self.start_memory else end_memory
         return time_taken, memory_used
 
     def set_limits(self, time_limit: int, memory_limit: int):
