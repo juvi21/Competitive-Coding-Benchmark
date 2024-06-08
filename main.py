@@ -64,7 +64,7 @@ def process_problem(judge, provider, problem_data: dict, shots: int, ignore_time
     sanitized_title = sanitize_filename(problem_title)
 
     for shot in range(1, shots + 1):
-        solution, prompt = provider.generate_solution(problem_data)
+        solution = provider.generate_solution(problem_data)
         if solution:
             if isinstance(judge, JavaJudge):
                 try:
@@ -108,10 +108,10 @@ def process_problem(judge, provider, problem_data: dict, shots: int, ignore_time
                     logger.log('info', f"Problem {index + 1}/{total_filtered_problems} Shot {shot}: {summary}")
                     if all(result['pass'] for result in results):
                         problems_passed += 1
-                        json_logger.log_problem(problem.title, problem.category or "Uncategorized", results, solution, problems_passed, {"shot": shot, "status": "passed"}, prompt, config.language)
+                        json_logger.log_problem(problem.title, problem.category or "Uncategorized", results, solution, problems_passed, {"shot": shot, "status": "passed"})
                         break
                     else:
-                        json_logger.log_problem(problem.title, problem.category or "Uncategorized", results, solution, problems_passed, {"shot": shot, "status": "failed"}, prompt, config.language)
+                        json_logger.log_problem(problem.title, problem.category or "Uncategorized", results, solution, problems_passed, {"shot": shot, "status": "failed"})
                 except ValidationError as e:
                     logger.log('error', f"Problem validation error: {e}")
             else:
