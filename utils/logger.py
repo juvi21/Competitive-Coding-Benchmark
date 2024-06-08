@@ -34,7 +34,6 @@ class JSONLogger:
                 "problems": [],
                 "total_passed_problems": 0
             }
-        # Ensure the directory exists
         os.makedirs(os.path.dirname(self.filename), exist_ok=True)
 
     def log_initial_config(self, config):

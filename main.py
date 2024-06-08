@@ -117,7 +117,6 @@ def main():
             else:
                 logger.log('error', "No provider configured")
 
-            # Clean up the solution and binary files after judging
             if os.path.exists(cpp_file):
                 os.remove(cpp_file)
             if os.path.exists(binary_file):
