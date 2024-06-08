@@ -42,11 +42,12 @@ class JSONLogger:
             "model": config.model,
             "provider": config.provider,
             "categories": config.categories,
-            "shots": config.shots
+            "shots": config.shots,
+            "language": config.language
         }
         self._write_log()
 
-    def log_problem(self, title, category, results, solution, total_problems_passed, shots_info):
+    def log_problem(self, title, category, results, solution, total_problems_passed, shots_info, prompt, language):
         passed_count = sum(1 for result in results if result['pass'])
         total_count = len(results)
         exceeded_time_count = sum(1 for result in results if "Time limit exceeded" in result.get("error", ""))
@@ -71,7 +72,9 @@ class JSONLogger:
             "exceeded_memory_count": exceeded_memory_count,
             "total_problems_passed": total_problems_passed,
             "passed": problem_passed,
-            "shots_info": shots_info
+            "shots_info": shots_info,
+            "prompt": prompt,
+            "language": language
         }
         self.data["problems"].append(problem_log)
         if problem_passed:

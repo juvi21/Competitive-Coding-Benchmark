@@ -42,4 +42,4 @@ class Config(BaseModel):
     categories: Optional[List[str]] = None
     shots: int = 1
     continue_from_log: Optional[str] = None 
-    language: str
+    language: str = "cpp"

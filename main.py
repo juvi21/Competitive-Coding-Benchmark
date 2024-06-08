@@ -1,10 +1,12 @@
 import os
 import json
+import shutil
 from tqdm import tqdm
 from pydantic import ValidationError
 from datasets import load_dataset
 from judges.cpp_judge import CppJudge
 from judges.python_judge import PythonJudge
+from judges.java_judge import JavaJudge
 from utils.logger import Logger, JSONLogger
 from utils.models import Problem, Config
 from utils.utils import sanitize_filename
@@ -46,31 +48,70 @@ def initialize_provider(config: Config, logger: Logger):
         logger.log('error', "Invalid provider specified")
         raise ValueError("Invalid provider specified")
 
+def initialize_judge(language: str, logger: Logger):
+    if language == "cpp":
+        return CppJudge(logger)
+    elif language == "python":
+        return PythonJudge(logger)
+    elif language == "java":
+        return JavaJudge(logger)
+    else:
+        logger.log('error', "Unsupported language specified")
+        raise ValueError("Unsupported language specified")
+
 def process_problem(judge, provider, problem_data: dict, shots: int, ignore_time_limits: bool, json_logger: JSONLogger, logger: Logger, problems_passed: int, total_filtered_problems: int, index: int) -> int:
     problem_title = problem_data['title']
     sanitized_title = sanitize_filename(problem_title)
-    
-    for shot in range(1, shots + 1):
-        source_file = os.path.join("temp", f"{sanitized_title}_shot_{shot}.{judge.language_extension}")
-        binary_file = os.path.join("temp", f"{sanitized_title}_binary_shot_{shot}")
 
-        solution = provider.generate_solution(problem_data)
+    for shot in range(1, shots + 1):
+        solution, prompt = provider.generate_solution(problem_data)
         if solution:
+            if isinstance(judge, JavaJudge):
+                try:
+                    class_name = judge.get_class_name(solution)
+                    source_file = os.path.join("temp", f"{class_name}.java")
+                    binary_file = os.path.join("temp", f"{class_name}.class")
+                except ValueError as e:
+                    logger.log('error', str(e))
+                    json_logger.log_compilation_error(problem_data["title"], problem_data.get("category", "Uncategorized"), solution, str(e), problems_passed, shot)
+                    continue
+            else:
+                source_file = os.path.join("temp", f"{sanitized_title}_shot_{shot}.{judge.language_extension}")
+                binary_file = os.path.join("temp", f"{sanitized_title}_binary_shot_{shot}")
+
             with open(source_file, 'w') as file:
                 file.write(solution)
-            
-            if judge.compile_code(source_file, binary_file):
+
+            if isinstance(judge, PythonJudge):
+                compile_success = True
+            else:
+                compile_success = judge.compile_code(source_file, binary_file)
+
+            if compile_success:
                 try:
                     problem = Problem(**problem_data)
-                    results = judge.judge_problem(problem, binary_file, ignore_time_limits)
+                    results = []
+                    for test_case in problem.test_cases:
+                        input_data = test_case.input
+                        if isinstance(judge, PythonJudge):
+                            result = judge.run_code(source_file, input_data, problem.time_limit, problem.memory_limit, ignore_time_limits)
+                        elif isinstance(judge, JavaJudge):
+                            result = judge.run_code(class_name, input_data, problem.time_limit, problem.memory_limit, ignore_time_limits)
+                        else:
+                            result = judge.run_code(binary_file, input_data, problem.time_limit, problem.memory_limit, ignore_time_limits)
+                        
+                        result['pass'] = judge.validate_output(result['output'], test_case.output)
+                        result['log'] = result.get('error', '') or ('Passed' if result['pass'] else 'Failed')
+                        results.append(result)
+
                     summary = generate_summary(results)
                     logger.log('info', f"Problem {index + 1}/{total_filtered_problems} Shot {shot}: {summary}")
                     if all(result['pass'] for result in results):
                         problems_passed += 1
-                        json_logger.log_problem(problem.title, problem.category or "Uncategorized", results, solution, problems_passed, {"shot": shot, "status": "passed"})
+                        json_logger.log_problem(problem.title, problem.category or "Uncategorized", results, solution, problems_passed, {"shot": shot, "status": "passed"}, prompt, config.language)
                         break
                     else:
-                        json_logger.log_problem(problem.title, problem.category or "Uncategorized", results, solution, problems_passed, {"shot": shot, "status": "failed"})
+                        json_logger.log_problem(problem.title, problem.category or "Uncategorized", results, solution, problems_passed, {"shot": shot, "status": "failed"}, prompt, config.language)
                 except ValidationError as e:
                     logger.log('error', f"Problem validation error: {e}")
             else:
@@ -80,11 +121,6 @@ def process_problem(judge, provider, problem_data: dict, shots: int, ignore_time
             logger.log('error', "Solution generation failed")
             json_logger.log_compilation_error(problem_data["title"], problem_data.get("category", "Uncategorized"), "No solution generated", "Solution generation failed", problems_passed, shot)
 
-        if os.path.exists(source_file):
-            os.remove(source_file)
-        if os.path.exists(binary_file):
-            os.remove(binary_file)
-    
     return problems_passed
 
 def main():
@@ -94,8 +130,8 @@ def main():
     os.makedirs("benchmark", exist_ok=True)
     os.makedirs("temp", exist_ok=True)
 
-    log_filename = os.path.join("benchmark", f"{sanitize_filename(config.provider)}_{sanitize_filename(config.model)}_log.json")
-    
+    log_filename = os.path.join("benchmark", f"{sanitize_filename(config.provider)}_{sanitize_filename(config.model)}_{sanitize_filename(config.language)}_log.json")
+
     if not config.continue_from_log:
         if os.path.exists(log_filename):
             os.remove(log_filename)
@@ -103,21 +139,14 @@ def main():
         json_logger.log_initial_config(config)
     else:
         json_logger = JSONLogger(log_filename)
-    
+
     problems = load_problems_from_hf("juvi21/cses-fi-competitive-coding-problems")
-    
-    categories_filter = config.categories  
+
+    categories_filter = config.categories
     shots = config.shots
     ignore_time_limits = config.ignore_time_limits
-    
-    if config.language == "cpp":
-        judge = CppJudge(logger)
-    elif config.language == "python":
-        judge = PythonJudge(logger)
-    else:
-        logger.log('error', "Unsupported language specified")
-        raise ValueError("Unsupported language specified")
-        
+
+    judge = initialize_judge(config.language, logger)
     provider = initialize_provider(config, logger)
 
     if categories_filter:
@@ -132,13 +161,16 @@ def main():
     for index, problem_str in enumerate(tqdm(filtered_problems, desc="Processing problems")):
         problem_data = json.loads(problem_str)
         problem_title = problem_data['title']
-        
+
         if problem_title in processed_titles:
             logger.log('info', f"Skipping already processed problem: {problem_title}")
             continue
 
         logger.log('info', f"Judging problem: {problem_title}")
         problems_passed = process_problem(judge, provider, problem_data, shots, ignore_time_limits, json_logger, logger, problems_passed, total_filtered_problems, index)
+
+    if os.path.exists("temp"):
+        shutil.rmtree("temp")
 
 if __name__ == "__main__":
     main()

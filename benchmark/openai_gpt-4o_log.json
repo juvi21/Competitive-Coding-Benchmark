@@ -3,112 +3,46 @@
         {
             "title": "Acyclic Graph Edges",
             "category": "Additional Problems",
-            "solution": "#include <iostream>\n#include <vector>\n#include <queue>\n\nusing namespace std;\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n\n    vector<vector<int>> adj(n + 1);\n    vector<int> in_degree(n + 1, 0);\n    vector<pair<int, int>> edges(m);\n\n    for (int i = 0; i < m; ++i) {\n        int a, b;\n        cin >> a >> b;\n        adj[a].push_back(b);\n        adj[b].push_back(a);\n        edges[i] = {a, b};\n    }\n\n    // Kahn's algorithm for topological sorting\n    vector<int> topological_order;\n    queue<int> q;\n\n    // A set to keep track of added edges\n    vector<vector<bool>> added_edge(n + 1, vector<bool>(n + 1, false));\n\n    // Use a visited array to mark visited nodes during our manual BFS/DFS\n    vector<bool> visited(n + 1, false);\n\n    auto bfs = [&](int start) {\n        q.push(start);\n        visited[start] = true;\n\n        while (!q.empty()) {\n            int node = q.front();\n            q.pop();\n            topological_order.push_back(node);\n\n            for (int neighbor : adj[node]) {\n                if (!visited[neighbor]) {\n                    visited[neighbor] = true;\n                    q.push(neighbor);\n                }\n            }\n        }\n    };\n\n    // In case the graph is disconnected, we need to perform BFS/DFS for each component\n    for (int i = 1; i <= n; ++i) {\n        if (!visited[i]) {\n            bfs(i);\n        }\n    }\n\n    // Map to find the position of each node in the topological order\n    vector<int> position(n + 1);\n    for (int i = 0; i < n; ++i) {\n        position[topological_order[i]] = i;\n    }\n\n    vector<pair<int, int>> result;\n\n    // Direct edges according to topological order\n    for (auto& edge : edges) {\n        int a = edge.first;\n        int b = edge.second;\n        if (position[a] < position[b]) {\n            result.push_back({a, b});\n        } else {\n            result.push_back({b, a});\n        }\n    }\n\n    // Output result\n    for (auto& directed_edge : result) {\n        cout << directed_edge.first << \" \" << directed_edge.second << endl;\n    }\n\n    return 0;\n}\n",
-            "passed_test_cases": 2,
-            "total_test_cases": 4,
-            "mean_time_taken": 0.2765219807624817,
-            "mean_memory_used": 0.0,
+            "solution": "#include <iostream>\n#include <vector>\n#include <queue>\n\nusing namespace std;\n\nvoid solve() {\n    int n, m;\n    cin >> n >> m;\n\n    vector<vector<int>> adj(n + 1);  // adjacency list for the graph\n    vector<int> in_degree(n + 1, 0); // in-degree of each node\n    vector<pair<int, int>> edges;    // store the edges\n\n    // Read edges and build the undirected graph\n    for (int i = 0; i < m; ++i) {\n        int a, b;\n        cin >> a >> b;\n        adj[a].push_back(b);\n        adj[b].push_back(a);\n        edges.push_back({a, b});\n    }\n\n    // Kahn's algorithm for topological sort\n    queue<int> q;\n    vector<int> topo_order;\n\n    // We need to use a visited array for undirected graph to treat it as directed for topological sort\n    vector<bool> visited(n + 1, false);\n\n    for (int i = 1; i <= n; ++i) {\n        if (!visited[i]) {\n            q.push(i);\n            visited[i] = true;\n\n            while (!q.empty()) {\n                int node = q.front();\n                q.pop();\n                topo_order.push_back(node);\n\n                for (int neighbor : adj[node]) {\n                    if (!visited[neighbor]) {\n                        visited[neighbor] = true;\n                        q.push(neighbor);\n                    }\n                }\n            }\n        }\n    }\n\n    // Map to store the position of each node in topo_order\n    vector<int> position(n + 1);\n    for (int i = 0; i < topo_order.size(); ++i) {\n        position[topo_order[i]] = i;\n    }\n\n    // Direct edges according to topological order\n    for (auto edge : edges) {\n        int a = edge.first;\n        int b = edge.second;\n        if (position[a] < position[b]) {\n            cout << a << \" \" << b << endl;\n        } else {\n            cout << b << \" \" << a << endl;\n        }\n    }\n}\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    solve();\n\n    return 0;\n}\n",
+            "passed_test_cases": 0,
+            "total_test_cases": 0,
+            "mean_time_taken": 0,
+            "mean_memory_used": 0,
             "failure_reasons": [
-                "",
-                ""
+                "Compilation failed"
             ],
-            "failed_test_cases": [
-                1,
-                3
-            ],
+            "failed_test_cases": [],
             "exceeded_time_count": 0,
             "exceeded_memory_count": 0,
             "total_problems_passed": 0,
             "passed": false,
-            "shots_info": {
-                "shot": 1,
-                "status": "failed"
-            }
+            "shot": 1
         },
         {
-            "title": "Acyclic Graph Edges",
+            "title": "Advertisement",
             "category": "Additional Problems",
-            "solution": "#include <iostream>\n#include <vector>\n#include <queue>\n#include <algorithm>\n\nusing namespace std;\n\nvoid addEdge(vector<vector<int>>& graph, int u, int v) {\n    graph[u].push_back(v);\n    graph[v].push_back(u);\n}\n\nvector<int> topologicalSort(int n, vector<vector<int>>& graph) {\n    vector<int> in_degree(n + 1, 0);\n    vector<vector<int>> adj(n + 1);\n    \n    // Convert undirected graph to directed graph for topological sorting\n    for (int u = 1; u <= n; ++u) {\n        for (int v : graph[u]) {\n            if (u < v) { // To avoid duplicate edges\n                adj[u].push_back(v);\n                in_degree[v]++;\n            }\n        }\n    }\n\n    queue<int> q;\n    for (int i = 1; i <= n; ++i) {\n        if (in_degree[i] == 0) {\n            q.push(i);\n        }\n    }\n\n    vector<int> topo_order;\n    while (!q.empty()) {\n        int u = q.front();\n        q.pop();\n        topo_order.push_back(u);\n\n        for (int v : adj[u]) {\n            if (--in_degree[v] == 0) {\n                q.push(v);\n            }\n        }\n    }\n\n    return topo_order;\n}\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n    vector<vector<int>> graph(n + 1);\n    vector<pair<int, int>> edges(m);\n\n    for (int i = 0; i < m; ++i) {\n        int a, b;\n        cin >> a >> b;\n        addEdge(graph, a, b);\n        edges[i] = {a, b};\n    }\n\n    vector<int> topo_order = topologicalSort(n, graph);\n    vector<int> position(n + 1);\n    for (int i = 0; i < n; ++i) {\n        position[topo_order[i]] = i;\n    }\n\n    for (const auto& edge : edges) {\n        int a = edge.first;\n        int b = edge.second;\n        if (position[a] < position[b]) {\n            cout << a << \" \" << b << endl;\n        } else {\n            cout << b << \" \" << a << endl;\n        }\n    }\n\n    return 0;\n}\n",
-            "passed_test_cases": 4,
-            "total_test_cases": 4,
-            "mean_time_taken": 0.13948076963424683,
-            "mean_memory_used": 0.0,
-            "failure_reasons": [],
+            "solution": "#include <iostream>\n#include <vector>\n#include <stack>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> heights(n);\n    for (int i = 0; i < n; i++) {\n        cin >> heights[i];\n    }\n\n    stack<int> s;\n    int max_area = 0;\n    int i = 0;\n\n    while (i < n) {\n        if (s.empty() || heights[s.top()] <= heights[i]) {\n            s.push(i++);\n        } else {\n            int tp = s.top();\n            s.pop();\n            int area = heights[tp] * (s.empty() ? i : i - s.top() - 1);\n            max_area = max(max_area, area);\n        }\n    }\n\n    while (!s.empty()) {\n        int tp = s.top();\n        s.pop();\n        int area = heights[tp] * (s.empty() ? i : i - s.top() - 1);\n        max_area = max(max_area, area);\n    }\n\n    cout << max_area << endl;\n    return 0;\n}\n",
+            "passed_test_cases": 0,
+            "total_test_cases": 0,
+            "mean_time_taken": 0,
+            "mean_memory_used": 0,
+            "failure_reasons": [
+                "Compilation failed"
+            ],
             "failed_test_cases": [],
             "exceeded_time_count": 0,
             "exceeded_memory_count": 0,
-            "total_problems_passed": 1,
-            "passed": true,
-            "shots_info": {
-                "shot": 2,
-                "status": "passed"
-            }
-        },
-        {
-            "title": "Advertisement",
-            "category": "Additional Problems",
-            "solution": "#include <iostream>\n#include <vector>\n#include <stack>\n\nusing namespace std;\n\nint largestRectangleArea(vector<int>& heights) {\n    stack<int> indices;\n    int maxArea = 0;\n    int n = heights.size();\n    \n    for (int i = 0; i < n; ++i) {\n        while (!indices.empty() && heights[i] < heights[indices.top()]) {\n            int h = heights[indices.top()];\n            indices.pop();\n            int width = indices.empty() ? i : i - indices.top() - 1;\n            maxArea = max(maxArea, h * width);\n        }\n        indices.push(i);\n    }\n    \n    while (!indices.empty()) {\n        int h = heights[indices.top()];\n        indices.pop();\n        int width = indices.empty() ? n : n - indices.top() - 1;\n        maxArea = max(maxArea, h * width);\n    }\n    \n    return maxArea;\n}\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> heights(n);\n    for (int i = 0; i < n; ++i) {\n        cin >> heights[i];\n    }\n    cout << largestRectangleArea(heights) << endl;\n    return 0;\n}\n",
-            "passed_test_cases": 7,
-            "total_test_cases": 11,
-            "mean_time_taken": 0.10466673157431862,
-            "mean_memory_used": 0.0,
-            "failure_reasons": [
-                "",
-                "",
-                "",
-                ""
-            ],
-            "failed_test_cases": [
-                2,
-                4,
-                6,
-                8
-            ],
-            "exceeded_time_count": 0,
-            "exceeded_memory_count": 0,
-            "total_problems_passed": 1,
+            "total_problems_passed": 0,
             "passed": false,
-            "shots_info": {
-                "shot": 1,
-                "status": "failed"
-            }
-        },
-        {
-            "title": "Advertisement",
-            "category": "Additional Problems",
-            "solution": "#include <iostream>\n#include <vector>\n#include <stack>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> heights(n);\n    for (int i = 0; i < n; ++i) {\n        cin >> heights[i];\n    }\n\n    stack<int> s;\n    int max_area = 0;\n    int i = 0;\n\n    while (i < n) {\n        if (s.empty() || heights[s.top()] <= heights[i]) {\n            s.push(i++);\n        } else {\n            int tp = s.top();\n            s.pop();\n            int width = s.empty() ? i : i - s.top() - 1;\n            int area = heights[tp] * width;\n            if (area > max_area) {\n                max_area = area;\n            }\n        }\n    }\n\n    while (!s.empty()) {\n        int tp = s.top();\n        s.pop();\n        int width = s.empty() ? i : i - s.top() - 1;\n        int area = heights[tp] * width;\n        if (area > max_area) {\n            max_area = area;\n        }\n    }\n\n    cout << max_area << endl;\n    return 0;\n}\n",
-            "passed_test_cases": 7,
-            "total_test_cases": 11,
-            "mean_time_taken": 0.10477926514365456,
-            "mean_memory_used": 0.0,
-            "failure_reasons": [
-                "",
-                "",
-                "",
-                ""
-            ],
-            "failed_test_cases": [
-                2,
-                4,
-                6,
-                8
-            ],
-            "exceeded_time_count": 0,
-            "exceeded_memory_count": 0,
-            "total_problems_passed": 1,
-            "passed": false,
-            "shots_info": {
-                "shot": 2,
-                "status": "failed"
-            }
+            "shot": 1
         }
     ],
-    "total_passed_problems": 1,
+    "total_passed_problems": 0,
     "initial_config": {
-        "ignore_time_limits": true,
+        "ignore_time_limits": false,
         "model": "gpt-4o",
         "provider": "openai",
         "categories": [],
-        "shots": 2
+        "shots": 1
     }
 }

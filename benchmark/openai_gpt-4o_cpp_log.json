@@ -1,0 +1,110 @@
+{
+    "problems": [
+        {
+            "title": "Acyclic Graph Edges",
+            "category": "Additional Problems",
+            "solution": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nvector<vector<int>> adj;\nvector<int> topological_order;\nvector<bool> visited;\nvector<pair<int, int>> edges;\n\nvoid dfs(int v) {\n    visited[v] = true;\n    for (int u : adj[v]) {\n        if (!visited[u]) {\n            dfs(u);\n        }\n    }\n    topological_order.push_back(v);\n}\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n    adj.resize(n + 1);\n    visited.resize(n + 1, false);\n\n    for (int i = 0; i < m; i++) {\n        int a, b;\n        cin >> a >> b;\n        edges.push_back({a, b});\n        adj[a].push_back(b);\n        adj[b].push_back(a);\n    }\n\n    for (int i = 1; i <= n; i++) {\n        if (!visited[i]) {\n            dfs(i);\n        }\n    }\n\n    reverse(topological_order.begin(), topological_order.end());\n    vector<int> pos(n + 1);\n    for (int i = 0; i < n; i++) {\n        pos[topological_order[i]] = i;\n    }\n\n    for (auto edge : edges) {\n        int a = edge.first;\n        int b = edge.second;\n        if (pos[a] < pos[b]) {\n            cout << a << \" \" << b << endl;\n        } else {\n            cout << b << \" \" << a << endl;\n        }\n    }\n\n    return 0;\n}\n",
+            "passed_test_cases": 2,
+            "total_test_cases": 4,
+            "mean_time_taken": 0.16167473793029785,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "Failed",
+                "Failed"
+            ],
+            "failed_test_cases": [
+                1,
+                3
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 0,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Advertisement",
+            "category": "Additional Problems",
+            "solution": "#include <iostream>\n#include <vector>\n#include <stack>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> heights(n);\n    for (int i = 0; i < n; ++i) {\n        cin >> heights[i];\n    }\n\n    stack<int> s;\n    int max_area = 0;\n    int i = 0;\n\n    while (i < n) {\n        // If this bar is higher than the bar at stack top, push it to the stack\n        if (s.empty() || heights[s.top()] <= heights[i]) {\n            s.push(i++);\n        } else {\n            // Pop the top\n            int tp = s.top();\n            s.pop();\n            // Calculate the area with heights[tp] as the smallest height\n            int area_with_top = heights[tp] * (s.empty() ? i : i - s.top() - 1);\n            // Update max_area, if needed\n            max_area = max(max_area, area_with_top);\n        }\n    }\n\n    // Now pop the remaining bars from stack and calculate area\n    while (!s.empty()) {\n        int tp = s.top();\n        s.pop();\n        int area_with_top = heights[tp] * (s.empty() ? i : i - s.top() - 1);\n        max_area = max(max_area, area_with_top);\n    }\n\n    cout << max_area << endl;\n    return 0;\n}\n",
+            "passed_test_cases": 7,
+            "total_test_cases": 11,
+            "mean_time_taken": 0.12348352779041637,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "Failed",
+                "Failed",
+                "Failed",
+                "Failed"
+            ],
+            "failed_test_cases": [
+                2,
+                4,
+                6,
+                8
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 0,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Another Game",
+            "category": "Mathematics",
+            "solution": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(NULL);\n\n    int t;\n    cin >> t; // Read the number of test cases\n\n    while (t--) {\n        int n;\n        cin >> n; // Read the number of heaps\n        long long sum = 0;\n        \n        for (int i = 0; i < n; ++i) {\n            int x;\n            cin >> x; // Read the number of coins in each heap\n            sum += x;\n        }\n        \n        if (sum % 2 == 1) {\n            cout << \"first\\n\";\n        } else {\n            cout << \"second\\n\";\n        }\n    }\n\n    return 0;\n}\n",
+            "passed_test_cases": 1,
+            "total_test_cases": 3,
+            "mean_time_taken": 0.10696872075398763,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "Failed",
+                "Failed"
+            ],
+            "failed_test_cases": [
+                1,
+                3
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 0,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Apartments",
+            "category": "Sorting and Searching",
+            "solution": "#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint main() {\n    int n, m, k;\n    std::cin >> n >> m >> k;\n    \n    std::vector<int> desired_sizes(n);\n    std::vector<int> apartment_sizes(m);\n    \n    for (int i = 0; i < n; ++i) {\n        std::cin >> desired_sizes[i];\n    }\n    \n    for (int i = 0; i < m; ++i) {\n        std::cin >> apartment_sizes[i];\n    }\n    \n    std::sort(desired_sizes.begin(), desired_sizes.end());\n    std::sort(apartment_sizes.begin(), apartment_sizes.end());\n    \n    int i = 0, j = 0;\n    int count = 0;\n    \n    while (i < n && j < m) {\n        if (apartment_sizes[j] >= desired_sizes[i] - k && apartment_sizes[j] <= desired_sizes[i] + k) {\n            // Apartment size is within the acceptable range for this applicant\n            ++count;\n            ++i;\n            ++j;\n        } else if (apartment_sizes[j] < desired_sizes[i] - k) {\n            // Current apartment is too small for the current applicant\n            ++j;\n        } else {\n            // Current apartment is too large for the current applicant\n            ++i;\n        }\n    }\n    \n    std::cout << count << std::endl;\n    \n    return 0;\n}\n",
+            "passed_test_cases": 19,
+            "total_test_cases": 19,
+            "mean_time_taken": 0.15677881240844727,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [],
+            "failed_test_cases": [],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 1,
+            "passed": true,
+            "shots_info": {
+                "shot": 1,
+                "status": "passed"
+            }
+        }
+    ],
+    "total_passed_problems": 1,
+    "initial_config": {
+        "ignore_time_limits": false,
+        "model": "gpt-4o",
+        "provider": "openai",
+        "categories": [],
+        "shots": 1
+    }
+}
