@@ -55,9 +55,55 @@
                 "shot": 1,
                 "status": "failed"
             }
+        },
+        {
+            "title": "Another Game",
+            "category": "Mathematics",
+            "solution": "#include<bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios_base::sync_with_stdio(false);\n    cin.tie(NULL);\n    int t;\n    cin >> t;\n    while(t--) {\n        int n, x;\n        cin >> n;\n        int nim_sum = 0;\n        for(int i = 0; i < n; i++) {\n            cin >> x;\n            nim_sum ^= x;\n        }\n        if(nim_sum == 0 || n%2 == 0) {\n            cout << \"first\\n\";\n        } else {\n            cout << \"second\\n\";\n        }\n    }\n    return 0;\n}",
+            "passed_test_cases": 0,
+            "total_test_cases": 3,
+            "mean_time_taken": 0.09176937739054362,
+            "mean_memory_used": 7745064.0,
+            "failure_reasons": [
+                "",
+                "",
+                ""
+            ],
+            "failed_test_cases": [
+                1,
+                2,
+                3
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 0,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Apartments",
+            "category": "Sorting and Searching",
+            "solution": "#include<bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n, m, k;\n    cin >> n >> m >> k;\n\n    vector<int> applicants(n), apartments(m);\n    for(int i=0; i<n; i++) cin >> applicants[i];\n    for(int i=0; i<m; i++) cin >> apartments[i];\n\n    sort(applicants.begin(), applicants.end());\n    sort(apartments.begin(), apartments.end());\n\n    int i=0, j=0, count=0;\n\n    while(i<n && j<m) {\n        if(abs(applicants[i] - apartments[j]) <= k) {\n            count++;\n            i++;\n            j++;\n        } else if(applicants[i] - apartments[j] > k) {\n            j++;\n        } else {\n            i++;\n        }\n    }\n\n    cout << count << \"\\n\";\n\n    return 0;\n}",
+            "passed_test_cases": 19,
+            "total_test_cases": 19,
+            "mean_time_taken": 0.13404369354248047,
+            "mean_memory_used": 7745064.0,
+            "failure_reasons": [],
+            "failed_test_cases": [],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 1,
+            "passed": true,
+            "shots_info": {
+                "shot": 1,
+                "status": "passed"
+            }
         }
     ],
-    "total_passed_problems": 0,
+    "total_passed_problems": 1,
     "initial_config": {
         "ignore_time_limits": false,
         "model": "gpt-4",
