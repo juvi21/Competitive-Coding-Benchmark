@@ -28,14 +28,13 @@ class AnthropicProvider(BaseProvider):
         try:
             response = self.client.messages.create(
                 model=self.model,
-                max_tokens=1000,
+                max_tokens=1500,
                 temperature=0.7,
                 system="You are a helpful assistant.",
                 messages=[{"role": "user", "content": prompt}]
             )
 
-            # Correctly handle the response object
-            raw_solution = ''.join([block.text for block in response.content]).strip()
+            raw_solution = ''.join([block.text for block in response.content]).strip() # this is a little hacky TODO
             self.logger.log('info', f"Generated raw solution: {raw_solution}")
 
             return self.extract_code(raw_solution)
