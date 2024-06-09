@@ -2,7 +2,6 @@ import anthropic
 from providers.base import BaseProvider
 from utils.logger import Logger
 
-# EXPERIMENTAL
 class AnthropicProvider(BaseProvider):
     def __init__(self, api_key: str, model: str, base_prompt: str, logger: Logger, language: str):
         super().__init__(logger, language)
@@ -26,14 +25,25 @@ class AnthropicProvider(BaseProvider):
             f"\nProvide the solution in a markdown {self.language} block.\n"
         )
 
-        response = self.client.messages.create(
-            model=self.model,
-            max_tokens=1500,
-            temperature=0.7,
-            system="You are a helpful assistant.",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        raw_solution = response['completion'].strip()
-        self.logger.log('info', f"Generated raw solution: {raw_solution}")
+        try:
+            response = self.client.messages.create(
+                model=self.model,
+                max_tokens=1000,
+                temperature=0.7,
+                system="You are a helpful assistant.",
+                messages=[{"role": "user", "content": prompt}]
+            )
 
-        return self.extract_code(raw_solution)
+            # Correctly handle the response object
+            raw_solution = ''.join([block.text for block in response.content]).strip()
+            self.logger.log('info', f"Generated raw solution: {raw_solution}")
+
+            return self.extract_code(raw_solution)
+        except anthropic.APIConnectionError as e:
+            self.logger.log('error', f"Connection error: {e}")
+        except anthropic.RateLimitError as e:
+            self.logger.log('error', f"Rate limit error: {e}")
+        except anthropic.APIStatusError as e:
+            self.logger.log('error', f"API error: {e.status_code} - {e.response}")
+
+        return None

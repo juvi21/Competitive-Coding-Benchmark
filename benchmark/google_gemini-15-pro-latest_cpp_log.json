@@ -1,0 +1,104 @@
+{
+    "problems": [
+        {
+            "title": "Acyclic Graph Edges",
+            "category": "Additional Problems",
+            "solution": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nvector<vector<int>> adj_list;\nvector<bool> visited;\nvector<pair<int, int>> directed_edges;\n\nvoid dfs(int u) {\n    visited[u] = true;\n    for (int v : adj_list[u]) {\n        if (!visited[v]) {\n            directed_edges.push_back({u, v});\n            dfs(v);\n        }\n    }\n}\n\nint main() {\n    int n, m;\n    cin >> n >> m;\n\n    adj_list.resize(n + 1);\n    visited.assign(n + 1, false);\n\n    for (int i = 0; i < m; ++i) {\n        int a, b;\n        cin >> a >> b;\n        adj_list[a].push_back(b);\n        adj_list[b].push_back(a);\n    }\n\n    for (int u = 1; u <= n; ++u) {\n        if (!visited[u]) {\n            dfs(u);\n        }\n    }\n\n    for (auto& edge : directed_edges) {\n        cout << edge.first << \" \" << edge.second << endl;\n    }\n\n    return 0;\n}",
+            "passed_test_cases": 1,
+            "total_test_cases": 4,
+            "mean_time_taken": 0.9182307124137878,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "Failed",
+                "Failed",
+                "Failed"
+            ],
+            "failed_test_cases": [
+                1,
+                2,
+                3
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 0,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Advertisement",
+            "category": "Additional Problems",
+            "solution": "#include <iostream>\n#include <stack>\n#include <vector>\n\nusing namespace std;\n\nint main() {\n  int n;\n  cin >> n;\n  vector<long long> heights(n);\n\n  for (int i = 0; i < n; ++i) {\n    cin >> heights[i];\n  }\n\n  stack<int> st;\n  st.push(-1);  // For handling the case when the stack becomes empty\n  long long max_area = 0;\n\n  for (int i = 0; i < n; ++i) {\n    while (!st.empty() && st.top() != -1 && heights[st.top()] >= heights[i]) {\n      long long current_height = heights[st.top()];\n      st.pop();\n      long long current_width = i - st.top() - 1;\n      max_area = max(max_area, current_height * current_width);\n    }\n    st.push(i);\n  }\n\n  // Process remaining bars in the stack\n  while (!st.empty() && st.top() != -1) {\n    long long current_height = heights[st.top()];\n    st.pop();\n    long long current_width = n - st.top() - 1;\n    max_area = max(max_area, current_height * current_width);\n  }\n\n  cout << max_area << endl;\n  return 0;\n}",
+            "passed_test_cases": 11,
+            "total_test_cases": 11,
+            "mean_time_taken": 0.11102600531144576,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [],
+            "failed_test_cases": [],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 1,
+            "passed": true,
+            "shots_info": {
+                "shot": 1,
+                "status": "passed"
+            }
+        },
+        {
+            "title": "Another Game",
+            "category": "Mathematics",
+            "solution": "#include <iostream>\n\nusing namespace std;\n\nint main() {\n    int t;\n    cin >> t;\n\n    while (t--) {\n        int n;\n        cin >> n;\n\n        int nimSum = 0;\n        for (int i = 0; i < n; ++i) {\n            int x;\n            cin >> x;\n            nimSum ^= x;\n        }\n\n        if (nimSum == 0) {\n            cout << \"second\" << endl;\n        } else {\n            cout << \"first\" << endl;\n        }\n    }\n\n    return 0;\n}",
+            "passed_test_cases": 0,
+            "total_test_cases": 3,
+            "mean_time_taken": 0.11788646380106609,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [
+                "Failed",
+                "Failed",
+                "Failed"
+            ],
+            "failed_test_cases": [
+                1,
+                2,
+                3
+            ],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 1,
+            "passed": false,
+            "shots_info": {
+                "shot": 1,
+                "status": "failed"
+            }
+        },
+        {
+            "title": "Apartments",
+            "category": "Sorting and Searching",
+            "solution": "#include <iostream>\n#include <vector>\n#include <algorithm>\n\nusing namespace std;\n\nint main() {\n    int n, m, k;\n    cin >> n >> m >> k;\n\n    vector<int> a(n);\n    vector<int> b(m);\n\n    for (int i = 0; i < n; ++i) {\n        cin >> a[i];\n    }\n\n    for (int i = 0; i < m; ++i) {\n        cin >> b[i];\n    }\n\n    sort(a.begin(), a.end());\n    sort(b.begin(), b.end());\n\n    int count = 0;\n    int j = 0; \n\n    for (int i = 0; i < n; ++i) {\n        while (j < m && b[j] < a[i] - k) { \n            j++; \n        }\n        if (j < m && b[j] <= a[i] + k) { \n            count++;\n            j++;\n        }\n    }\n\n    cout << count << endl;\n    return 0;\n}",
+            "passed_test_cases": 19,
+            "total_test_cases": 19,
+            "mean_time_taken": 0.3110225451620002,
+            "mean_memory_used": 0.0,
+            "failure_reasons": [],
+            "failed_test_cases": [],
+            "exceeded_time_count": 0,
+            "exceeded_memory_count": 0,
+            "total_problems_passed": 2,
+            "passed": true,
+            "shots_info": {
+                "shot": 1,
+                "status": "passed"
+            }
+        }
+    ],
+    "total_passed_problems": 2,
+    "initial_config": {
+        "ignore_time_limits": false,
+        "model": "gemini-1.5-pro-latest",
+        "provider": "google",
+        "categories": [],
+        "shots": 1
+    }
+}

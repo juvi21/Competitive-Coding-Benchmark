@@ -1,0 +1,13 @@
+{
+    "ignore_time_limits": false,
+    "provider": "openai",
+    "api_key": "",
+    "model": "gpt-4o",
+    "base_prompt": "You are a world-class competitive programmer. Go step by step through the following problem. At the end, provide the entire solution in a markdown python block. You code will be run against a an online judge. So be mindful about that",
+    "categories": [],
+    "shots": 1,
+    "language": "python",
+    "continue_from_log": "benchmark/openai_gpt-4o_python_log.json" 
+
+
+}

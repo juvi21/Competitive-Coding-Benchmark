@@ -14,6 +14,7 @@ from providers.openai import OpenAIProvider
 from providers.huggingface import HuggingFaceProvider
 from providers.anthropic import AnthropicProvider
 from providers.mistral import MistralProvider
+from providers.google import GoogleProvider
 
 def load_problems_from_hf(dataset_name: str, split: str = 'train') -> list[str]:
     dataset = load_dataset(dataset_name, split=split)
@@ -44,6 +45,8 @@ def initialize_provider(config: Config, logger: Logger):
         return AnthropicProvider(config.api_key, config.model, config.base_prompt, logger, config.language)
     elif config.provider == "mistral":
         return MistralProvider(config.api_key, config.model, config.base_prompt, logger, config.language)
+    elif config.provider == "google":
+        return GoogleProvider(config.api_key, config.model, config.base_prompt, logger, config.language)
     else:
         logger.log('error', "Invalid provider specified")
         raise ValueError("Invalid provider specified")

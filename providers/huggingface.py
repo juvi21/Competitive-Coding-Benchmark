@@ -2,7 +2,7 @@ from transformers import pipeline
 from providers.base import BaseProvider
 from utils.logger import Logger
 
-#EXPERIMENTAL
+#EXPERIMENTAL. TODO: Maybe adapt https://github.com/EleutherAI/lm-evaluation-harness/blob/main/lm_eval/models/huggingface.py
 class HuggingFaceProvider(BaseProvider):
     def __init__(self, model: str, base_prompt: str, logger: Logger, language: str):
         super().__init__(logger, language)

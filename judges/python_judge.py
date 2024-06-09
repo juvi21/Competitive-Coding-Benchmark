@@ -16,6 +16,9 @@ class PythonJudge(BaseJudge):
         tracker = ResourceTracker(ignore_time_limits)
         tracker.start()
 
+        time_taken = None
+        memory_used = None
+
         try:
             result = subprocess.run(['python3', binary_path], input=input_data, text=True,
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
@@ -30,4 +33,8 @@ class PythonJudge(BaseJudge):
                 "memory_used": memory_used
             }
         except subprocess.TimeoutExpired:
+            time_taken, memory_used = tracker.stop()  
             return {"success": False, "output": "", "error": "Time limit exceeded", "time_taken": time_limit, "memory_used": memory_used}
+        except Exception as e:
+            time_taken, memory_used = tracker.stop()
+            return {"success": False, "output": "", "error": str(e), "time_taken": time_taken, "memory_used": memory_used}
