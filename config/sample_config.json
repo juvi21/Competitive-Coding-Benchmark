@@ -7,5 +7,4 @@
     "categories": ["Advanced Techniques", "Sorting and Searching"],
     "shots": 3,
     "continue_from_log": "benchmark/openai_gpt-4o_log.json" 
-
 }

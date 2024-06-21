@@ -8,6 +8,4 @@
     "shots": 1,
     "language": "python",
     "continue_from_log": "benchmark/openai_gpt-4o_python_log.json" 
-
-
 }
