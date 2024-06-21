@@ -3,6 +3,8 @@
 
 This benchmark aims to evaluate the performance of different LLMs against high-quality representative competitive coding problems sourced from [cses.fi](https://cses.fi/). These problems span a wide range of categories that require creative thinking and problem-solving ability.
 
+**Just wanna see the results:** [Skip to Benchmark Results](#results-benchmark)
+
 The code is designed to allow easy addition of new providers. Take a look at the providers folder to get inspiration from the currently implemented providers: Anthropic, Google, Huggingface (not tested), Mistral, and OpenAI are currently supported. It should also be easy to add new judges; currently supported are Python, C++, and Java (experimental), as they represent the most commonly used languages in competitive coding.
 
 **WARNING**: This repo is currently in a toy status. Use at your own risk.
