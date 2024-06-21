@@ -64,6 +64,8 @@ The output will look something like this for each problem. More ways to evaluate
 ```
 
 ## Results Benchmark
+Threshold is defined as the ratio of passed test cases to the total number of test cases for each problem. A problem is considered passed if the ratio meets or exceeds the specified threshold. For example, with a threshold of 0.5, a problem is considered passed if at least 9/16 Test-Cases are successful.
+
 ![Overall Performance](assets/Overall_performance.png)
 ![Overall Performance After Thresholds](assets/Overall_performance_after_thresholds.png)
 ![Performance Across Categories Threshold 1 Shot 0](assets/performance_across_categories_threshold_1_shot_0.png)
