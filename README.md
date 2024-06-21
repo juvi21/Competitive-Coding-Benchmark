@@ -70,7 +70,7 @@ The output will look something like this for each problem. More ways to evaluate
 
 ## Known Limitations
 - As of now, the data might be contaminated since it may have seen solutions to some of these problems.
-- Additional problems should be further specified into subcategories as it is very large.
+- `Additional problems` should be further specified into subcategories as it is very large.
 - Better analysis of the data.
 
 ## Citation
